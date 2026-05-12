@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MARMO E ANIMA — Una Mostra su Antonio Canova</title>
+  <meta name="description" content="Un museo virtuale interattivo dedicato ai capolavori neoclassici di Antonio Canova. Cinque sculture, un'unica emozione.">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #0a0806;
+      overflow: hidden;
+      font-family: Georgia, 'Times New Roman', serif;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* ─── ENTRANCE SCREEN ─── */
+    #entrance {
+      position: fixed;
+      inset: 0;
+      z-index: 100;
+      background: #050302;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1.5s ease;
+      overflow: hidden;
+    }
+
+    /* Portrait background */
+    #canova-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    #canova-portrait {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 18%;
+      opacity: 0;
+      animation: portrait-reveal 4s ease-out 0.3s forwards;
+      filter: sepia(0.35) brightness(0.58) contrast(1.08);
+    }
+
+    /* Vignette: fades portrait edges to dark brown */
+    #canova-overlay {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 90% 85% at 50% 38%,
+          transparent 10%,
+          rgba(10, 8, 6, 0.45) 45%,
+          rgba(5, 3, 2, 0.82) 70%,
+          #050302 92%),
+        linear-gradient(to bottom,
+          rgba(5, 3, 2, 0.35) 0%,
+          transparent 22%,
+          transparent 52%,
+          rgba(5, 3, 2, 0.72) 74%,
+          #050302 90%);
+    }
+
+    /* Entrance text wrapper sits above the portrait */
+    .entrance-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      opacity: 0;
+      animation: content-reveal 2.2s ease-out 1.8s forwards;
+    }
+
+    @keyframes portrait-reveal {
+      0%   { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes content-reveal {
+      0%   { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .entrance-gold-bar {
+      width: 40px;
+      height: 1px;
+      background: #c9a96e;
+      margin-bottom: 28px;
+    }
+
+    #entrance h1 {
+      font-family: Georgia, serif;
+      font-size: 4.5rem;
+      color: #e8d5a3;
+      letter-spacing: 0.15em;
+      font-weight: 400;
+      line-height: 1;
+      margin-bottom: 16px;
+      text-shadow: 0 2px 24px rgba(0,0,0,0.9), 0 0 8px rgba(0,0,0,0.6);
+    }
+
+    #entrance .subtitle1 {
+      font-style: italic;
+      font-size: 1rem;
+      color: #dcc99a;
+      letter-spacing: 0.05em;
+      text-shadow: 0 1px 12px rgba(0,0,0,0.85), 0 0 4px rgba(0,0,0,0.6);
+    }
+
+    #entrance .subtitle2 {
+      font-size: 0.78rem;
+      color: #a8926a;
+      letter-spacing: 0.1em;
+      margin-top: 8px;
+      text-shadow: 0 1px 10px rgba(0,0,0,0.9), 0 0 4px rgba(0,0,0,0.7);
+    }
+
+    #enter-btn {
+      margin-top: 44px;
+      padding: 14px 52px;
+      background: transparent;
+      border: 1px solid #c9a96e;
+      color: #c9a96e;
+      font-family: Georgia, serif;
+      font-size: 0.82rem;
+      letter-spacing: 0.3em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #enter-btn:hover {
+      background: #c9a96e;
+      color: #0a0806;
+    }
+
+    /* ─── HUD ─── */
+    #title-watermark {
+      position: fixed;
+      top: 20px;
+      left: 24px;
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      color: #2a1e10;
+      display: none;
+      pointer-events: none;
+    }
+
+    #controls-hint {
+      position: fixed;
+      bottom: 24px;
+      left: 24px;
+      font-size: 0.7rem;
+      color: #6b5c40;
+      line-height: 2.0;
+      opacity: 0.35;
+      display: none;
+      pointer-events: none;
+      font-family: Georgia, serif;
+    }
+
+    #artwork-prompt {
+      position: fixed;
+      bottom: 48px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    #artwork-prompt.visible {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      animation: prompt-pulse 1.8s ease-in-out infinite;
+    }
+
+    .prompt-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      border: 1.5px solid #c9a96e;
+      color: #c9a96e;
+      font-family: Georgia, serif;
+      font-size: 1rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      flex-shrink: 0;
+    }
+
+    .prompt-text {
+      font-family: Georgia, serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.28em;
+      color: #e8d5a3;
+      text-transform: uppercase;
+    }
+
+    #artwork-prompt-bg {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 12px 28px 12px 20px;
+      background: rgba(10, 8, 6, 0.82);
+      border: 1px solid rgba(201, 169, 110, 0.35);
+      border-radius: 2px;
+      display: none;
+      pointer-events: none;
+      backdrop-filter: blur(4px);
+    }
+
+    #artwork-prompt-bg.visible {
+      display: block;
+    }
+
+    @keyframes prompt-pulse {
+      0%, 100% { opacity: 0.55; }
+      50% { opacity: 1.0; }
+    }
+
+    #crosshair {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 16px;
+      height: 16px;
+      display: none;
+      pointer-events: none;
+    }
+
+    #crosshair::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 16px;
+      background: rgba(201, 169, 110, 0.45);
+    }
+
+    #crosshair::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: 16px;
+      height: 1px;
+      background: rgba(201, 169, 110, 0.45);
+    }
+
+    /* ─── MINIMAP ─── */
+    #minimap {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 110px;
+      height: 110px;
+      background: #0a0806;
+      border: 1px solid #1e1608;
+      display: none;
+    }
+
+    #minimap-canvas {
+      display: block;
+    }
+
+    /* ─── INFO PANEL ─── */
+    #info-panel {
+      position: fixed;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%) translateX(100%);
+      width: 420px;
+      height: 90vh;
+      overflow-y: auto;
+      background: rgba(12, 9, 5, 0.97);
+      border-left: 1px solid #3a2e1c;
+      transition: transform 0.45s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      padding: 40px 36px;
+      z-index: 50;
+      font-family: Georgia, serif;
+    }
+
+    #info-panel.visible {
+      transform: translateY(-50%) translateX(0);
+    }
+
+    #info-panel::-webkit-scrollbar { width: 4px; }
+    #info-panel::-webkit-scrollbar-track { background: #0a0806; }
+    #info-panel::-webkit-scrollbar-thumb { background: #3a2e1c; }
+
+    #panel-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      background: none;
+      border: none;
+      color: #5a4a30;
+      font-size: 1.1rem;
+      cursor: pointer;
+      font-family: Georgia, serif;
+      transition: color 0.2s;
+      padding: 4px 8px;
+    }
+
+    #panel-close:hover { color: #c9a96e; }
+
+    .panel-gold-bar {
+      width: 32px;
+      height: 1px;
+      background: #c9a96e;
+      margin-bottom: 14px;
+    }
+
+    #panel-number {
+      font-size: 0.6rem;
+      color: #5a4a30;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    #panel-title {
+      font-size: 1.35rem;
+      color: #e8d5a3;
+      font-weight: 400;
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+
+    #panel-year {
+      font-size: 0.75rem;
+      font-style: italic;
+      color: #8a7250;
+      margin-bottom: 4px;
+    }
+
+    #panel-location {
+      font-size: 0.72rem;
+      color: #5a4a30;
+      margin-bottom: 4px;
+    }
+
+    #panel-material {
+      font-size: 0.7rem;
+      color: #4a3d28;
+      margin-bottom: 18px;
+    }
+
+    .panel-divider {
+      height: 1px;
+      background: linear-gradient(to right, #3a2e1c, transparent);
+      margin: 14px 0;
+    }
+
+    .panel-label {
+      font-size: 0.58rem;
+      color: #5a4a30;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      display: block;
+    }
+
+    #panel-committente {
+      font-size: 0.78rem;
+      color: #8a7a5a;
+      line-height: 1.85;
+      margin-bottom: 16px;
+    }
+
+    #panel-desc {
+      font-size: 0.8rem;
+      color: #b5a07a;
+      line-height: 1.9;
+      margin-bottom: 16px;
+    }
+
+    #panel-emotion {
+      font-size: 0.8rem;
+      font-style: italic;
+      color: #9a8460;
+      line-height: 1.85;
+    }
+
+    /* ─── LOADING OVERLAY ─── */
+    #loading-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 200;
+      background: #050302;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 1s ease;
+    }
+
+    #loading-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .loading-text {
+      font-family: Georgia, serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.35em;
+      color: #5a4a30;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+
+    .loading-bar-outer {
+      width: 160px;
+      height: 1px;
+      background: #1a1208;
+    }
+
+    .loading-bar-inner {
+      height: 1px;
+      background: #c9a96e;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay">
+    <div class="loading-text">Preparazione della mostra</div>
+    <div class="loading-bar-outer">
+      <div class="loading-bar-inner" id="loading-bar"></div>
+    </div>
+  </div>
+
+  <!-- Entrance screen -->
+  <div id="entrance">
+    <!-- Canova portrait background -->
+    <div id="canova-bg">
+      <img id="canova-portrait" src="Antonio-Canova-biografia-e-opere.jpg" alt="Ritratto di Antonio Canova">
+      <div id="canova-overlay"></div>
+    </div>
+    <!-- Title + button (floats above portrait) -->
+    <div class="entrance-content">
+      <div class="entrance-gold-bar"></div>
+      <h1>MARMO E ANIMA</h1>
+      <p class="subtitle1">Una Mostra su Antonio Canova</p>
+      <p class="subtitle2">Tema: La Bellezza · Cinque capolavori neoclassici</p>
+      <button id="enter-btn">[ ENTRA NELLA MOSTRA ]</button>
+    </div>
+  </div>
+
+  <!-- HUD -->
+  <div id="title-watermark">MARMO E ANIMA</div>
+
+  <div id="controls-hint">
+    W A S D — muoviti<br>
+    Mouse — guarda<br>
+    E — apri scheda opera<br>
+    F — schermo intero<br>
+    ESC — chiudi / sblocca<br>
+    Shift — corri
+  </div>
+
+  <div id="artwork-prompt-bg"></div>
+  <div id="artwork-prompt">
+    <span class="prompt-key">E</span>
+    <span class="prompt-text">Leggi scheda opera</span>
+  </div>
+
+  <div id="crosshair"></div>
+
+  <!-- Minimap -->
+  <div id="minimap">
+    <canvas id="minimap-canvas" width="110" height="110"></canvas>
+  </div>
+
+  <!-- Info Panel -->
+  <div id="info-panel">
+    <button id="panel-close">✕</button>
+    <div class="panel-gold-bar"></div>
+    <div id="panel-number">OPERA 01 / 06</div>
+    <div id="panel-title">–</div>
+    <div id="panel-year">–</div>
+    <div id="panel-location">–</div>
+    <div id="panel-material">–</div>
+    <div class="panel-divider"></div>
+    <span class="panel-label">Committente</span>
+    <div id="panel-committente">–</div>
+    <div class="panel-divider"></div>
+    <span class="panel-label">Descrizione</span>
+    <div id="panel-desc">–</div>
+    <div class="panel-divider"></div>
+    <span class="panel-label">Emozioni</span>
+    <div id="panel-emotion">–</div>
+  </div>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+
+  <script>
+  'use strict';
+
+  // ─── FILE:// PROTOCOL GUARD ───
+  if (window.location.protocol === 'file:') {
+    document.body.innerHTML = [
+      '<div style="position:fixed;inset:0;background:#050302;display:flex;flex-direction:column;',
+      'align-items:center;justify-content:center;font-family:Georgia,serif;color:#e8d5a3;">',
+      '<div style="width:40px;height:1px;background:#c9a96e;margin-bottom:28px;"></div>',
+      '<h1 style="font-size:2.2rem;letter-spacing:.15em;font-weight:400;margin-bottom:20px;">MARMO E ANIMA</h1>',
+      '<p style="color:#8a7250;font-size:.9rem;margin-bottom:32px;">Il museo richiede un server HTTP per caricare i modelli 3D.</p>',
+      '<div style="background:rgba(201,169,110,.08);border:1px solid #3a2e1c;padding:24px 40px;text-align:left;">',
+      '<p style="color:#c9a96e;font-size:.72rem;letter-spacing:.2em;margin-bottom:12px;">COME AVVIARE</p>',
+      '<code style="color:#e8d5a3;font-size:.9rem;font-family:monospace;display:block;margin-bottom:8px;">',
+      'python -m http.server 8080</code>',
+      '<p style="color:#5a4a30;font-size:.75rem;margin-top:8px;">Poi apri: <span style="color:#c9a96e;">http://localhost:8080</span></p>',
+      '</div></div>'
+    ].join('');
+    throw new Error('file:// protocol not supported — use http://localhost:8080');
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ARTWORK DATA
+  // ═══════════════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════════
+  // ARTWORK DATA — 6 sculptures in 2 rows of 3 (back to back)
+  //  row:'north'  →  z = -8,  facing south (toward entrance)
+  //  row:'south'  →  z = +7,  facing north (back to entrance)
+  //  columns are at (±12, ±5) — chosen x values avoid them
+  // ═══════════════════════════════════════════════════════════════════
+  const ARTWORKS = [
+    // ── NORTH ROW (facing south / toward entrance) ──
+    {
+      id: 1, row: 'north',
+      title: "Psiche ravvivata dal bacio di Amore",
+      year: "1787–1793",
+      location: "Musée du Louvre, Parigi",
+      material: "Marmo bianco di Carrara · 155×168 cm",
+      model: "models/models_opt/psiche.glb",
+      pic: "statue_pics/psiche.jpg",
+      position: { x: -9, z: -8 },
+      committente: "Colonnello inglese John Campbell (1787). Non ritirata per problemi economici, venduta a Gioacchino Murat nel 1800, donata a Napoleone nel 1808 e trasferita al Louvre.",
+      desc: "Raffigura il momento tratto dalla favola di Apuleio in cui Amore risveglia Psiche dal sonno infernale con un bacio. Le labbra dei due amanti sono sospese a pochi millimetri dal contatto — un attimo eterno congelato nel marmo. La composizione forma una X che invita a girare attorno alla scultura. Canova levigo la superficie con acqua di rota per ottenere un effetto simile alla carne viva.",
+      emotion: "Dolcezza e malinconia — la bellezza dell'amore nel momento in cui sboccia, fragile, prezioso, irripetibile."
+    },
+    {
+      id: 2, row: 'north',
+      title: "Le Tre Grazie",
+      year: "1812–1817",
+      location: "Museo dell'Ermitage, San Pietroburgo",
+      material: "Marmo bianco · h. 182 cm",
+      model: "models/models_opt/le_tre_grazie.glb",
+      pic: "statue_pics/Le_Tre_Grazie.jpg",
+      position: { x: 0, z: -8 },
+      committente: "Giuseppina di Beauharnais, prima moglie di Napoleone (1812). Morì nel 1814 senza vederla completata. Una seconda versione fu commissionata da John Russell, VI duca di Bedford — oggi al V&A Museum di Londra.",
+      desc: "Le tre dee figlie di Zeus — Aglaia, Eufrosine e Talia — simbolo di splendore, gioia e prosperità, colte in un tenero abbraccio. Canova innovò la tradizione: tutte e tre si rivolgono verso lo spettatore. Ispirò il poema incompiuto Alle Grazie di Ugo Foscolo.",
+      emotion: "Calore, armonia, senso di completezza. La bellezza del legame tra persone care — quella che non ha bisogno di parole, solo di presenza."
+    },
+    {
+      id: 3, row: 'north',
+      title: "Venere Italica",
+      year: "1804–1812",
+      location: "Galleria Palatina, Palazzo Pitti, Firenze",
+      material: "Marmo bianco di Carrara · ~172 cm",
+      model: "models/models_opt/venere_italica.glb",
+      pic: "statue_pics/venere_italica.jpg",
+      position: { x: 9, z: -8 },
+      committente: "Re d'Etruria Ludovico I di Borbone (1802). Commissionata come sostituto della Venere de' Medici trafugata dai francesi. Canova rifiutò di copiare l'originale. Giunse a Firenze il 29 aprile 1812.",
+      desc: "La dea nell'atto pudico di asciugarsi dopo il bagno, con il velo che scende lungo i fianchi. Foscolo scrisse: \"una bellissima donna capace di far innamorare, mentre la Medici è un'impassibile dea\".",
+      emotion: "Discrezione, mistero, rispetto quasi timido. Non urla la propria bellezza: la sussurra. Una bellezza che si percepisce più che si vede."
+    },
+    // ── SOUTH ROW (facing north / back to entrance) ──
+    {
+      id: 4, row: 'south',
+      title: "Paolina Borghese come Venere vincitrice",
+      year: "1804–1808",
+      location: "Galleria Borghese, Sala I, Roma",
+      material: "Marmo di Carrara · 200 cm (lunghezza)",
+      model: "models/models_opt/paolina.glb",
+      pic: "statue_pics/Paolina.jpg",
+      position: { x: -9, z: 7 },
+      committente: "Principe Camillo Borghese per le nozze con Paolina Bonaparte, sorella di Napoleone (1803). Pagata 6.000 scudi nel maggio 1808. Giunta alla Galleria Borghese nel 1838.",
+      desc: "Paolina raffigurata come Venere vincitrice del giudizio di Paride, con il pomo d'oro in mano. Distesa su un'agrippina, busto nudo e fianchi velati. Sotto il divano è nascosto un meccanismo che fa ruotare la scultura a 360°.",
+      emotion: "Sicurezza, potere, bellezza consapevole di sé. Come se la scultura stesse guardando noi, e non il contrario."
+    },
+    {
+      id: 5, row: 'south',
+      title: "Ebe",
+      year: "1796 (completata ~1799)",
+      location: "Alte Nationalgalerie, Berlino",
+      material: "Marmo bianco con bronzo dorato · 161 cm",
+      model: "models/models_opt/ebe.glb",
+      pic: "statue_pics/ebe.jpg",
+      position: { x: 0, z: 7 },
+      committente: "Conte Giuseppe Giacomo Albrizzi (1796). Ebe, figlia di Zeus ed Era, era la coppiera degli dei dell'Olimpo, personificazione della giovinezza eterna.",
+      desc: "Canova la ritrae sospesa su una nuvola, in equilibrio su un solo piede, come colta in un passo di danza. L'uso del bronzo suscito polemiche; Canova rispose ai critici: Se le avessi dato piu espressione, sarebbe diventata una baccante.",
+      emotion: "Leggerezza, gioia e liberta — la bellezza della giovinezza quando ci si sente invincibili e il tempo sembra fermo."
+    },
+    {
+      id: 6, row: 'south',
+      title: "Reclining Figure",
+      year: "1951",
+      location: "Collezioni e musei internazionali",
+      material: "Bronzo",
+      model: "models/models_opt/Reclining_Figure.glb",
+      pic: "statue_pics/RecliningFigure.jpg",
+      position: { x: 9, z: 7 },
+      committente: "Opera di Henry Moore (1898-1986), scultore britannico. Confronto con Canova: se Canova cerca la perfezione classica del corpo umano, Moore cerca una bellezza piu moderna, essenziale e organica.",
+      desc: "Scultura che rappresenta una figura umana distesa in modo morbido e naturale. Il corpo non e realistico nei dettagli, ma semplificato e armonico, con forme fluide che richiamano la natura e la femminilita. La figura appare calma e integrata nello spazio, come se fosse parte del paesaggio.",
+      emotion: "Calma, armonia e naturalezza — una bellezza umana piu semplice e introspettiva, meno perfetta ma piu legata alla natura rispetto all'ideale assoluto di Canova."
+    }
+  ];
+
+  // ═══════════════════════════════════════════════════════════════════
+  // COLLISION DATA (walls + columns)
+  // ═══════════════════════════════════════════════════════════════════
+  const COLLISION_BOXES = [
+    { type:'wall', minX:-25, maxX:25, minZ:14.7, maxZ:15.3 },
+    { type:'wall', minX:-25, maxX:25, minZ:-15.3, maxZ:-14.7 },
+    { type:'wall', minX:24.7, maxX:25.3, minZ:-15, maxZ:15 },
+    { type:'wall', minX:-25.3, maxX:-24.7, minZ:-15, maxZ:15 },
+    { type:'cylinder', cx:-12, cz:-5, r:1.2 },
+    { type:'cylinder', cx:12,  cz:-5, r:1.2 },
+    { type:'cylinder', cx:-12, cz:5,  r:1.2 },
+    { type:'cylinder', cx:12,  cz:5,  r:1.2 },
+  ];
+
+  // ═══════════════════════════════════════════════════════════════════
+  // THREE.JS SETUP
+  // ═══════════════════════════════════════════════════════════════════
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x0d0a06, 20, 55);
+
+  const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 80);
+  camera.position.set(0, 1.72, 10);
+  camera.rotation.order = 'YXZ';
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.82;
+  renderer.outputEncoding = THREE.sRGBEncoding;
+  document.body.appendChild(renderer.domElement);
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // TEXTURE GENERATORS
+  // ═══════════════════════════════════════════════════════════════════
+  function makeDiamondTexture() {
+    const size = 256;
+    const cvs = document.createElement('canvas');
+    cvs.width = size; cvs.height = size;
+    const ctx = cvs.getContext('2d');
+    ctx.fillStyle = '#e8e2d4';
+    ctx.fillRect(0, 0, size, size);
+    ctx.strokeStyle = '#3a3530';
+    ctx.lineWidth = 0.8;
+    ctx.globalAlpha = 0.18;
+    // diagonal lines
+    for (let i = -size; i < size * 2; i += 32) {
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i + size, size);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(i, 0);
+      ctx.lineTo(i - size, size);
+      ctx.stroke();
+    }
+    const tex = new THREE.CanvasTexture(cvs);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(16, 10);
+    return tex;
+  }
+
+  function makeCofferTexture() {
+    const size = 512;
+    const cvs = document.createElement('canvas');
+    cvs.width = size; cvs.height = size;
+    const ctx = cvs.getContext('2d');
+    ctx.fillStyle = '#f0ece0';
+    ctx.fillRect(0, 0, size, size);
+    const panel = 480;
+    const inner = 440;
+    const offset = (size - panel) / 2;
+    const iOffset = (size - inner) / 2;
+    // outer rib
+    ctx.fillStyle = '#f0ece0';
+    ctx.strokeStyle = '#c9a96e';
+    ctx.lineWidth = 1.5;
+    // inner panel
+    ctx.fillStyle = '#e0dcd0';
+    ctx.fillRect(iOffset, iOffset, inner, inner);
+    // gold border
+    ctx.strokeStyle = '#c9a96e';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(offset, offset, panel, panel);
+    ctx.lineWidth = 1;
+    ctx.strokeRect(iOffset, iOffset, inner, inner);
+    const tex = new THREE.CanvasTexture(cvs);
+    tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(12, 7);
+    return tex;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // AGENT 1 — ROOM GEOMETRY
+  // ═══════════════════════════════════════════════════════════════════
+  (function buildRoom() {
+
+    // — Floor —
+    const floorGeo = new THREE.PlaneGeometry(50, 30);
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0xe8e2d4, roughness: 0.2, metalness: 0.05
+    });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // Diamond overlay
+    const diamondGeo = new THREE.PlaneGeometry(50, 30);
+    const diamondMat = new THREE.MeshStandardMaterial({
+      map: makeDiamondTexture(), roughness: 0.3, metalness: 0.0, transparent: true, opacity: 0.45
+    });
+    const diamond = new THREE.Mesh(diamondGeo, diamondMat);
+    diamond.rotation.x = -Math.PI / 2;
+    diamond.position.y = 0.002;
+    diamond.receiveShadow = false;
+    scene.add(diamond);
+
+    // — Ceiling —
+    const ceilGeo = new THREE.PlaneGeometry(50, 30);
+    const ceilMat = new THREE.MeshStandardMaterial({
+      color: 0xf0ece0, roughness: 0.9, metalness: 0.0, map: makeCofferTexture()
+    });
+    const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.y = 8;
+    scene.add(ceiling);
+
+    // — Walls —
+    const wallMat = new THREE.MeshStandardMaterial({ color: 0xede8dc, roughness: 0.9, metalness: 0.0 });
+
+    function makeWall(w, h, d, x, y, z) {
+      const geo = new THREE.BoxGeometry(w, h, d);
+      const mesh = new THREE.Mesh(geo, wallMat);
+      mesh.position.set(x, y, z);
+      mesh.castShadow = false;
+      mesh.receiveShadow = true;
+      scene.add(mesh);
+      return mesh;
+    }
+
+    makeWall(50, 8, 0.3,  0, 4, -15); // north
+    makeWall(50, 8, 0.3,  0, 4,  15); // south
+    makeWall(0.3, 8, 30, 25, 4,   0); // east
+    makeWall(0.3, 8, 30,-25, 4,   0); // west
+
+    // Dado rail
+    const dadoMat = new THREE.MeshStandardMaterial({ color: 0xd8d0c0, roughness: 0.8, metalness: 0.0 });
+    function makeDado(w, d, x, z) {
+      const geo = new THREE.BoxGeometry(w, 0.1, d);
+      const m = new THREE.Mesh(geo, dadoMat);
+      m.position.set(x, 1.0, z);
+      scene.add(m);
+    }
+    makeDado(50.3, 0.03,  0, -15);
+    makeDado(50.3, 0.03,  0,  15);
+    makeDado(0.03, 30.3, 25,   0);
+    makeDado(0.03, 30.3,-25,   0);
+
+    // Gold cornice
+    const corniceMat = new THREE.MeshStandardMaterial({ color: 0xc9a96e, metalness: 0.7, roughness: 0.3 });
+    function makeCornice(w, d, x, z) {
+      const geo = new THREE.BoxGeometry(w, 0.12, d);
+      const m = new THREE.Mesh(geo, corniceMat);
+      m.position.set(x, 7.9, z);
+      scene.add(m);
+    }
+    makeCornice(50.4, 0.04,  0, -15);
+    makeCornice(50.4, 0.04,  0,  15);
+    makeCornice(0.04, 30.4, 25,   0);
+    makeCornice(0.04, 30.4,-25,   0);
+
+    // — Columns —
+    const colMat = new THREE.MeshStandardMaterial({ color: 0xd4cfc4, roughness: 0.7, metalness: 0.0 });
+    const colPositions = [[-12,-5],[12,-5],[-12,5],[12,5]];
+    colPositions.forEach(([cx, cz]) => {
+      const colGeo = new THREE.CylinderGeometry(0.65, 0.75, 8, 16);
+      const col = new THREE.Mesh(colGeo, colMat);
+      col.position.set(cx, 4, cz);
+      col.castShadow = true;
+      col.receiveShadow = true;
+      scene.add(col);
+
+      const plinthGeo = new THREE.BoxGeometry(2, 0.4, 2);
+      const plinth = new THREE.Mesh(plinthGeo, colMat);
+      plinth.position.set(cx, 0.2, cz);
+      plinth.castShadow = true;
+      plinth.receiveShadow = true;
+      scene.add(plinth);
+    });
+
+    // ── GRAND NEOCLASSICAL ENTRANCE DOOR ────────────────────────────────
+    {
+      const wx      = 24.85;   // wall face x
+      const dHW     = 2.10;    // door half-width  → total opening 4.2 m
+      const dH      = 4.8;     // door leaf height
+      const archR   = dHW;     // fanlight radius = door half-width
+      const leafW   = 2.00;    // width of each door leaf
+      const bw      = 0.12;    // wood border/rail width
+
+      const dWoodMat = new THREE.MeshStandardMaterial({
+        color: 0x5c2a0a, roughness: 0.42, metalness: 0.06
+      });
+      const dStoneMat = new THREE.MeshStandardMaterial({
+        color: 0xd4cfc4, roughness: 0.75, metalness: 0.0
+      });
+      const dIronMat = new THREE.MeshStandardMaterial({
+        color: 0x1c1a16, roughness: 0.55, metalness: 0.50
+      });
+      const dGoldMat = new THREE.MeshStandardMaterial({
+        color: 0xb8902a, roughness: 0.26, metalness: 0.88
+      });
+      const dGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x0e1a12, roughness: 0.04, metalness: 0.18,
+        transparent: true, opacity: 0.82
+      });
+      const dFanGlassMat = new THREE.MeshStandardMaterial({
+        color: 0x0c1610, roughness: 0.0, metalness: 0.12,
+        transparent: true, opacity: 0.58,
+        emissive: 0x04100a, emissiveIntensity: 0.3,
+        side: THREE.DoubleSide
+      });
+
+      // ── Stone arch torus (NO rotation.z — arches upward correctly) ──
+      const archTorus = new THREE.Mesh(
+        new THREE.TorusGeometry(archR + 0.33, 0.31, 10, 40, Math.PI), dStoneMat
+      );
+      archTorus.rotation.y = -Math.PI / 2;
+      archTorus.position.set(wx, dH, 0);
+      scene.add(archTorus);
+
+      // Inner decorative arch ring
+      const archInner = new THREE.Mesh(
+        new THREE.TorusGeometry(archR + 0.06, 0.10, 8, 40, Math.PI), dStoneMat
+      );
+      archInner.rotation.y = -Math.PI / 2;
+      archInner.position.set(wx - 0.05, dH, 0);
+      scene.add(archInner);
+
+      // ── Stone pilasters (left & right) ──────────────────────────────
+      const pilH = dH + archR + 0.65;
+      [-2.72, 2.72].forEach(pz => {
+        // Shaft
+        const shaft = new THREE.Mesh(new THREE.BoxGeometry(0.44, pilH, 0.58), dStoneMat);
+        shaft.position.set(wx, pilH / 2, pz);
+        scene.add(shaft);
+        // Capital (wider top block)
+        const cap = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.32, 0.76), dStoneMat);
+        cap.position.set(wx, pilH + 0.16, pz);
+        scene.add(cap);
+        // Plinth (wider base)
+        const plinBase = new THREE.Mesh(new THREE.BoxGeometry(0.44, 0.24, 0.76), dStoneMat);
+        plinBase.position.set(wx, 0.12, pz);
+        scene.add(plinBase);
+      });
+
+      // ── Entablature band above arch ──────────────────────────────────
+      const entab = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.62, 6.6), dStoneMat);
+      entab.position.set(wx, dH + archR + 0.65 + 0.31, 0);
+      scene.add(entab);
+
+      // ── Side jambs (stone reveals left & right of opening) ──────────
+      [-1, 1].forEach(s => {
+        const jamb = new THREE.Mesh(new THREE.BoxGeometry(0.50, dH + 0.16, 0.34), dStoneMat);
+        jamb.position.set(wx - 0.25, dH / 2, s * (dHW + 0.17));
+        scene.add(jamb);
+      });
+
+      // Transom stone bar (separates door from fanlight)
+      const transomBar = new THREE.Mesh(
+        new THREE.BoxGeometry(0.50, 0.30, dHW * 2 + 0.04), dStoneMat
+      );
+      transomBar.position.set(wx - 0.25, dH + 0.15, 0);
+      scene.add(transomBar);
+
+      // ── Fanlight — dark glass disc ────────────────────────────────────
+      const fanGlass = new THREE.Mesh(
+        new THREE.CircleGeometry(archR - 0.06, 40, 0, Math.PI), dFanGlassMat
+      );
+      fanGlass.rotation.y = -Math.PI / 2;
+      fanGlass.position.set(wx - 0.14, dH, 0);
+      scene.add(fanGlass);
+
+      // Iron outer ring
+      const fanRing = new THREE.Mesh(
+        new THREE.TorusGeometry(archR - 0.06, 0.052, 8, 40, Math.PI), dIronMat
+      );
+      fanRing.rotation.y = -Math.PI / 2;
+      fanRing.position.set(wx - 0.14, dH, 0);
+      scene.add(fanRing);
+
+      // Iron mid ring (crosses the spokes)
+      const midRing = new THREE.Mesh(
+        new THREE.TorusGeometry(archR * 0.52, 0.042, 8, 32, Math.PI), dIronMat
+      );
+      midRing.rotation.y = -Math.PI / 2;
+      midRing.position.set(wx - 0.14, dH, 0);
+      scene.add(midRing);
+
+      // 7 radiating iron spokes
+      const spokeLen = archR - 0.14;
+      for (let i = 0; i <= 6; i++) {
+        const alpha = (i / 6) * Math.PI;   // 0=rightmost → π=leftmost
+        const spoke = new THREE.Mesh(
+          new THREE.BoxGeometry(0.058, spokeLen, 0.058), dIronMat
+        );
+        // rotation.x = π/2 - alpha fans the boxes in the YZ plane
+        spoke.rotation.x = Math.PI / 2 - alpha;
+        spoke.position.set(
+          wx - 0.14,
+          dH + (spokeLen / 2) * Math.sin(alpha),
+          (spokeLen / 2) * Math.cos(alpha)
+        );
+        scene.add(spoke);
+      }
+
+      // ── Door leaves ──────────────────────────────────────────────────
+      [-1, 1].forEach(side => {
+        const lz = side * (leafW / 2 + 0.04);  // leaf center z
+        const lx = wx - 0.13;                    // slightly inset from wall face
+
+        // Main leaf body
+        const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.11, dH, leafW), dWoodMat);
+        leaf.position.set(lx, dH / 2, lz);
+        scene.add(leaf);
+
+        // Outer + inner vertical stiles (slightly proud)
+        [-leafW / 2 + bw / 2, leafW / 2 - bw / 2].forEach(sz => {
+          const stile = new THREE.Mesh(new THREE.BoxGeometry(0.135, dH, bw), dWoodMat);
+          stile.position.set(lx, dH / 2, lz + sz);
+          scene.add(stile);
+        });
+
+        // Top + bottom rails
+        [dH - bw / 2, bw / 2].forEach(ry => {
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(0.135, bw, leafW), dWoodMat);
+          rail.position.set(lx, ry, lz);
+          scene.add(rail);
+        });
+
+        // 3 internal horizontal rails → 4 panel zones
+        [dH * 0.73, dH * 0.455, dH * 0.215].forEach(ry => {
+          const rail = new THREE.Mesh(new THREE.BoxGeometry(0.135, bw, leafW - bw * 2), dWoodMat);
+          rail.position.set(lx, ry, lz);
+          scene.add(rail);
+        });
+
+        // Center vertical stile (divides each leaf into 2 columns)
+        const cStile = new THREE.Mesh(new THREE.BoxGeometry(0.135, dH, bw), dWoodMat);
+        cStile.position.set(lx, dH / 2, lz);
+        scene.add(cStile);
+
+        // Glass + iron panels (2 columns × 4 rows = 8 panels per leaf)
+        const panW = (leafW - bw * 3 - 0.04) / 2;   // width of each column of glass
+        const panelRows = [
+          { cy: (dH * 0.73 + dH - bw) / 2,           ph: dH - bw - dH * 0.73 - bw - 0.04 },
+          { cy: (dH * 0.455 + dH * 0.73) / 2,         ph: dH * 0.73 - dH * 0.455 - bw - 0.04 },
+          { cy: (dH * 0.215 + dH * 0.455) / 2,        ph: dH * 0.455 - dH * 0.215 - bw - 0.04 },
+          { cy: (bw + dH * 0.215) / 2,                 ph: dH * 0.215 - bw - bw - 0.04 },
+        ];
+        [-1, 1].forEach(col => {
+          const cz = lz + col * (panW / 2 + bw / 2);
+          panelRows.forEach(({ cy, ph }) => {
+            if (ph < 0.12) return;
+            // Iron border surround
+            const surr = new THREE.Mesh(
+              new THREE.BoxGeometry(0.095, ph + 0.06, panW + 0.06), dIronMat
+            );
+            surr.position.set(lx - 0.015, cy, cz);
+            scene.add(surr);
+            // Dark glass fill
+            const gl = new THREE.Mesh(
+              new THREE.BoxGeometry(0.075, ph, panW), dGlassMat
+            );
+            gl.position.set(lx + 0.005, cy, cz);
+            scene.add(gl);
+          });
+        });
+
+        // Decorative studs along outer vertical edge
+        const outerStudZ = lz + side * (leafW / 2 - 0.065);
+        for (let sy = 0.25; sy < dH - 0.25; sy += 0.50) {
+          const stud = new THREE.Mesh(new THREE.SphereGeometry(0.044, 6, 4), dGoldMat);
+          stud.position.set(lx - 0.075, sy, outerStudZ);
+          scene.add(stud);
+        }
+
+        // Gold vertical handle near inner edge
+        const innerZ = lz - side * (leafW / 2 - 0.26);
+        const handleBar = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.026, 0.026, 0.58, 8), dGoldMat
+        );
+        handleBar.position.set(lx - 0.105, dH * 0.42, innerZ);
+        scene.add(handleBar);
+        const handleRose = new THREE.Mesh(
+          new THREE.CylinderGeometry(0.052, 0.052, 0.038, 10), dGoldMat
+        );
+        handleRose.position.set(lx - 0.105, dH * 0.42, innerZ);
+        scene.add(handleRose);
+      });
+
+      // ── 3-step stone staircase ────────────────────────────────────────
+      [
+        { h: 0.39, w: 5.6, cx: 23.40 },
+        { h: 0.26, w: 5.1, cx: 23.74 },
+        { h: 0.13, w: 4.6, cx: 24.06 },
+      ].forEach(({ h, w, cx }) => {
+        const step = new THREE.Mesh(new THREE.BoxGeometry(0.45, h, w), dStoneMat);
+        step.position.set(cx, h / 2, 0);
+        scene.add(step);
+      });
+
+      // Keystone at arch crown
+      const ks = new THREE.Mesh(new THREE.BoxGeometry(0.48, 0.52, 0.42), dStoneMat);
+      ks.position.set(wx, dH + archR + 0.06, 0);
+      scene.add(ks);
+
+      // Warm entrance light
+      const doorLight = new THREE.PointLight(0xffe8c8, 0.85, 15, 1.8);
+      doorLight.position.set(wx - 4.5, 5.5, 0);
+      scene.add(doorLight);
+    }
+
+    // — Pedestals —
+    const pedMat = new THREE.MeshStandardMaterial({ color: 0x2a2520, roughness: 0.5, metalness: 0.1 });
+    const pedTopMat = new THREE.MeshStandardMaterial({ color: 0x3a3530, roughness: 0.4, metalness: 0.1 });
+    const nameplateMat = new THREE.MeshStandardMaterial({ color: 0xb89040, metalness: 0.7, roughness: 0.3 });
+
+    ARTWORKS.forEach(art => {
+      const pedGeo = new THREE.BoxGeometry(1.5, 1.2, 1.5);
+      const ped = new THREE.Mesh(pedGeo, pedMat);
+      ped.position.set(art.position.x, 0.6, art.position.z);
+      ped.receiveShadow = true;
+      ped.castShadow = true;
+      scene.add(ped);
+
+      const topGeo = new THREE.BoxGeometry(1.5, 0.05, 1.5);
+      const top = new THREE.Mesh(topGeo, pedTopMat);
+      top.position.set(art.position.x, 1.225, art.position.z);
+      scene.add(top);
+
+      // Marble transition block between pedestal top and sculpture
+      const transitionMat = new THREE.MeshStandardMaterial({ color: 0xe8e4da, roughness: 0.3 });
+      const transitionGeo = new THREE.BoxGeometry(0.8, 0.15, 0.8);
+      const transition = new THREE.Mesh(transitionGeo, transitionMat);
+      transition.position.set(art.position.x, 1.325, art.position.z);
+      transition.castShadow = true;
+      transition.receiveShadow = true;
+      scene.add(transition);
+
+      // Nameplate faces the viewer: south row faces north (z-0.78), north row faces south (z+0.78)
+      const npOffset = art.row === 'south' ? -0.78 : 0.78;
+      const npGeo = new THREE.BoxGeometry(0.9, 0.15, 0.06);
+      const np = new THREE.Mesh(npGeo, nameplateMat);
+      np.position.set(art.position.x, 0.8, art.position.z + npOffset);
+      if (art.row === 'south') np.rotation.y = Math.PI; // face north
+      scene.add(np);
+    });
+
+    // — Picture frames on wall behind each sculpture —
+    const outerFrameMat = new THREE.MeshStandardMaterial({
+      color: 0xb89040, metalness: 0.65, roughness: 0.35
+    });
+    const innerFrameMat = new THREE.MeshStandardMaterial({
+      color: 0x8a6a28, metalness: 0.5, roughness: 0.5
+    });
+    const fallbackCanvasMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1208, roughness: 1.0, metalness: 0.0
+    });
+    const texLoader = new THREE.TextureLoader();
+
+    ARTWORKS.forEach(art => {
+      const frameGroup = new THREE.Group();
+      const isNorth = art.row === 'north';
+      const wallZ = isNorth ? -14.82 : 14.82;
+      // Raised to y=5.0 so larger frame clears the sculpture tops
+      frameGroup.position.set(art.position.x, 5.0, wallZ);
+      frameGroup.rotation.y = isNorth ? 0 : Math.PI;
+
+      // Outer gold frame — top, bottom, left, right
+      // Outer size: 4.0 wide × 4.5 tall, bar thickness 0.28
+      const fTop = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.28, 0.14), outerFrameMat);
+      fTop.position.set(0, 2.11, 0);
+      frameGroup.add(fTop);
+      const fBot = new THREE.Mesh(new THREE.BoxGeometry(4.0, 0.28, 0.14), outerFrameMat);
+      fBot.position.set(0, -2.11, 0);
+      frameGroup.add(fBot);
+      const fLeft = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.5, 0.14), outerFrameMat);
+      fLeft.position.set(-1.86, 0, 0);
+      frameGroup.add(fLeft);
+      const fRight = new THREE.Mesh(new THREE.BoxGeometry(0.28, 4.5, 0.14), outerFrameMat);
+      fRight.position.set(1.86, 0, 0);
+      frameGroup.add(fRight);
+
+      // Inner darker lip
+      const iTop = new THREE.Mesh(new THREE.BoxGeometry(3.72, 0.12, 0.11), innerFrameMat);
+      iTop.position.set(0, 1.97, 0.02);
+      frameGroup.add(iTop);
+      const iBot = new THREE.Mesh(new THREE.BoxGeometry(3.72, 0.12, 0.11), innerFrameMat);
+      iBot.position.set(0, -1.97, 0.02);
+      frameGroup.add(iBot);
+      const iLeft = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.94, 0.11), innerFrameMat);
+      iLeft.position.set(-1.72, 0, 0.02);
+      frameGroup.add(iLeft);
+      const iRight = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.94, 0.11), innerFrameMat);
+      iRight.position.set(1.72, 0, 0.02);
+      frameGroup.add(iRight);
+
+      // Canvas — load sculpture photo as texture, fallback to dark if missing
+      const canvasMat = art.pic
+        ? new THREE.MeshStandardMaterial({
+            map: texLoader.load(art.pic),
+            roughness: 0.85, metalness: 0.0
+          })
+        : fallbackCanvasMat;
+      const canvas = new THREE.Mesh(new THREE.PlaneGeometry(3.44, 3.94), canvasMat);
+      canvas.position.set(0, 0, 0.04);
+      canvas.name = `frame_canvas_${art.id}`;
+      frameGroup.add(canvas);
+
+      scene.add(frameGroup);
+    });
+
+    // — Baseboard —
+    const baseboardMat = new THREE.MeshStandardMaterial({ color: 0xd8d0c0, roughness: 0.9, metalness: 0.0 });
+    function makeBaseboard(w, d, x, z) {
+      const geo = new THREE.BoxGeometry(w, 0.12, d);
+      const m = new THREE.Mesh(geo, baseboardMat);
+      m.position.set(x, 0.06, z);
+      scene.add(m);
+    }
+    makeBaseboard(50.3, 0.04,  0, -15);
+    makeBaseboard(50.3, 0.04,  0,  15);
+    makeBaseboard(0.04, 30.3, 25,   0);
+    makeBaseboard(0.04, 30.3,-25,   0);
+
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ARCHED WINDOWS
+  // ═══════════════════════════════════════════════════════════════════
+  function buildWindows() {
+    // ── Materials ──
+    // Stone outer surround (lighter than wall so it stands out)
+    const stoneMat = new THREE.MeshStandardMaterial({
+      color: 0xd8d2c5, roughness: 0.8, metalness: 0.02
+    });
+    // Dark warm wood for inner frame + mullions (high contrast against pale wall)
+    const woodMat = new THREE.MeshStandardMaterial({
+      color: 0x5a3218, roughness: 0.55, metalness: 0.05
+    });
+    // Glass — visible sky-blue tint, semi-transparent
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: 0x5ab0d0, roughness: 0.0, metalness: 0.15,
+      transparent: true, opacity: 0.55,
+      emissive: 0x3888a8, emissiveIntensity: 0.6
+    });
+    // Sky backdrop — solid bright sky plane sits AT the wall surface,
+    // visible through the transparent glass
+    const skyMat = new THREE.MeshStandardMaterial({
+      color: 0x7ec8e3, roughness: 1.0, metalness: 0.0,
+      emissive: 0x5ab4d0, emissiveIntensity: 1.4,
+      side: THREE.DoubleSide
+    });
+
+    // ── Geometry constants ──
+    const winW  = 2.6;           // glass width along Z axis
+    const winH  = 4.0;           // rectangular glass height
+    const archR = winW / 2;      // 1.3 m arch radius
+    const sw    = 0.28;          // stone bar profile width
+    const fd    = 0.32;          // depth of stone bars into room
+    const ww    = 0.13;          // wood mullion / inner-frame width
+    const sillY = 1.9;           // y bottom of glass (top of sill)
+    const topY  = sillY + winH;  // 5.9 = top of rect glass = arch centre
+
+    const windowZPositions = [-8, 0, 8];
+
+    [
+      { wallX:  25, sign:  1, faceAngle: -Math.PI / 2 },
+      { wallX: -25, sign: -1, faceAngle:  Math.PI / 2 }
+    ].forEach(({ wallX, sign, faceAngle }) => {
+      windowZPositions.forEach(wz => {
+        if (wallX === 25 && wz === 0) return; // door is here
+
+        const faceX  = wallX - sign * (fd / 2);        // stone bars centred here
+        const glassX = wallX - sign * 0.25;             // glass / mullion plane — 10 cm into room
+        const skyX   = wallX - sign * 0.18;             // sky backdrop — 3 cm into room from wall face
+
+        // ── Sky backdrop (makes glass look like real sky outside) ──
+        const skyBg = new THREE.Mesh(
+          new THREE.PlaneGeometry(winW + 0.05, winH + archR + 0.1), skyMat
+        );
+        skyBg.rotation.y = faceAngle;
+        skyBg.position.set(skyX, sillY + (winH + archR) / 2, wz);
+        scene.add(skyBg);
+
+        // ── Stone sill (wide protruding ledge) ──
+        const sill = new THREE.Mesh(
+          new THREE.BoxGeometry(fd + 0.24, 0.20, winW + sw * 2 + 0.24), stoneMat
+        );
+        sill.position.set(wallX - sign * (fd / 2 + 0.12), sillY - 0.10, wz);
+        scene.add(sill);
+
+        // ── Stone jambs (left + right reveals) ──
+        const lJamb = new THREE.Mesh(new THREE.BoxGeometry(fd, winH + sw, sw), stoneMat);
+        lJamb.position.set(faceX, sillY + winH / 2, wz - winW / 2 - sw / 2);
+        scene.add(lJamb);
+        const rJamb = new THREE.Mesh(new THREE.BoxGeometry(fd, winH + sw, sw), stoneMat);
+        rJamb.position.set(faceX, sillY + winH / 2, wz + winW / 2 + sw / 2);
+        scene.add(rJamb);
+
+        // ── Stone lintel (horizontal bar below arch) ──
+        const lintel = new THREE.Mesh(
+          new THREE.BoxGeometry(fd, sw, winW + sw * 2), stoneMat
+        );
+        lintel.position.set(faceX, topY + sw / 2, wz);
+        scene.add(lintel);
+
+        // ── Stone arch torus ──
+        const archFrame = new THREE.Mesh(
+          new THREE.TorusGeometry(archR + sw * 0.4, sw * 0.55, 8, 28, Math.PI), stoneMat
+        );
+        archFrame.rotation.y = faceAngle;
+        archFrame.position.set(faceX, topY, wz);
+        scene.add(archFrame);
+
+        // ── Glass: rectangular pane ──
+        const glassRect = new THREE.Mesh(new THREE.PlaneGeometry(winW, winH), glassMat);
+        glassRect.rotation.y = faceAngle;
+        glassRect.position.set(glassX, sillY + winH / 2, wz);
+        scene.add(glassRect);
+
+        // ── Glass: arched semicircle ──
+        const archGlass = new THREE.Mesh(
+          new THREE.CircleGeometry(archR, 24, 0, Math.PI), glassMat
+        );
+        archGlass.rotation.y = faceAngle;
+        archGlass.position.set(glassX, topY, wz);
+        scene.add(archGlass);
+
+        // ── Wood inner border (dark frame just inside stone surround) ──
+        // top rail
+        const wTop = new THREE.Mesh(new THREE.BoxGeometry(0.12, ww, winW + ww * 2), woodMat);
+        wTop.position.set(glassX, topY - ww / 2, wz);
+        scene.add(wTop);
+        // bottom rail
+        const wBot = new THREE.Mesh(new THREE.BoxGeometry(0.12, ww, winW + ww * 2), woodMat);
+        wBot.position.set(glassX, sillY + ww / 2, wz);
+        scene.add(wBot);
+        // left stile
+        const wLeft = new THREE.Mesh(new THREE.BoxGeometry(0.12, winH, ww), woodMat);
+        wLeft.position.set(glassX, sillY + winH / 2, wz - winW / 2 - ww / 2);
+        scene.add(wLeft);
+        // right stile
+        const wRight = new THREE.Mesh(new THREE.BoxGeometry(0.12, winH, ww), woodMat);
+        wRight.position.set(glassX, sillY + winH / 2, wz + winW / 2 + ww / 2);
+        scene.add(wRight);
+
+        // ── Wood mullions: 2 vertical dividers → 3 columns ──
+        [-winW / 3, winW / 3].forEach(zOff => {
+          const vMull = new THREE.Mesh(new THREE.BoxGeometry(0.12, winH, ww), woodMat);
+          vMull.position.set(glassX, sillY + winH / 2, wz + zOff);
+          scene.add(vMull);
+        });
+
+        // ── Wood meeting rail (horizontal, at 60% height — upper/lower sash split) ──
+        const meetRail = new THREE.Mesh(new THREE.BoxGeometry(0.12, ww * 1.4, winW), woodMat);
+        meetRail.position.set(glassX, sillY + winH * 0.6, wz);
+        scene.add(meetRail);
+
+        // ── Window light (cool daylight spilling into room) ──
+        const wLight = new THREE.PointLight(0xc8e8f8, 0.6, 13, 2);
+        wLight.position.set(wallX - sign * 3.0, 4.5, wz);
+        scene.add(wLight);
+      });
+    });
+  }
+  buildWindows();
+
+  // ═══════════════════════════════════════════════════════════════════
+  // AGENT 2 — LIGHTING  (theatrical: dark base + focused warm spots)
+  // ═══════════════════════════════════════════════════════════════════
+  (function buildLighting() {
+
+    // Very dim ambient — just enough to kill pure black
+    scene.add(new THREE.AmbientLight(0x1a1208, 0.22));
+
+    // Subtle warm fill from above — does NOT wash out shadows
+    const hemi = new THREE.HemisphereLight(0xffe8c0, 0x0a0804, 0.18);
+    scene.add(hemi);
+
+    // Ceiling fill lights — dimmer, tighter range so they don't pollute everything
+    const fillPositions = [[-12,7.5,-5],[12,7.5,-5],[-12,7.5,5],[12,7.5,5]];
+    fillPositions.forEach(([lx, ly, lz]) => {
+      const pt = new THREE.PointLight(0xfff0d8, 0.55, 18, 2);
+      pt.position.set(lx, ly, lz);
+      scene.add(pt);
+    });
+
+    // Per-sculpture spotlights — direction depends on which row
+    ARTWORKS.forEach(art => {
+      const ax = art.position.x;
+      const az = art.position.z;
+      // North row faces south (+z): spotlight comes from south side (az + offset)
+      // South row faces north (-z): spotlight comes from north side (az - offset)
+      const spotZOffset = art.row === 'south' ? -1.8 : 1.8;
+      const fillXOffset = art.row === 'south' ? -3 : 3;
+      const fillZOffset = art.row === 'south' ? -3 : 3;
+      const rimZOffset  = art.row === 'south' ?  2.2 : -2.2;
+
+      // Main spot: tight cone, high intensity
+      const spot = new THREE.SpotLight(0xfff5d0, 6.0, 18, Math.PI / 10, 0.28, 1.4);
+      spot.position.set(ax, 7.8, az + spotZOffset);
+      spot.target.position.set(ax, 1.2, az);
+      spot.castShadow = true;
+      spot.shadow.mapSize.set(512, 512);
+      spot.shadow.bias = -0.001;
+      scene.add(spot);
+      scene.add(spot.target);
+
+      // Warm fill spot from the front side
+      const fill = new THREE.SpotLight(0xffd090, 1.2, 10, Math.PI / 6, 0.6, 2);
+      fill.position.set(ax + fillXOffset, 4, az + fillZOffset);
+      fill.target.position.set(ax, 1.8, az);
+      fill.castShadow = false;
+      scene.add(fill);
+      scene.add(fill.target);
+
+      // Cool rim light from behind — gives depth
+      const rim = new THREE.PointLight(0x8090b0, 0.6, 5, 2);
+      rim.position.set(ax, 3.0, az + rimZOffset);
+      scene.add(rim);
+    });
+
+    // Column base warm uplight — museum uplighting effect
+    const colPositions = [[-12,-5],[12,-5],[-12,5],[12,5]];
+    colPositions.forEach(([cx, cz]) => {
+      const pt = new THREE.PointLight(0xc08040, 0.5, 5, 2);
+      pt.position.set(cx, 0.3, cz);
+      scene.add(pt);
+    });
+
+    // Minimal corner fill — just prevent total void
+    [[-18, 2.5, -10],[18, 2.5, -10],[-18, 2.5, 10],[18, 2.5, 10]].forEach(([lx,ly,lz]) => {
+      const pt = new THREE.PointLight(0xffeedd, 0.18, 14, 2);
+      pt.position.set(lx, ly, lz);
+      scene.add(pt);
+    });
+
+  })();
+
+  // ═══════════════════════════════════════════════════════════════════
+  // CEILING LIGHT FIXTURES
+  // ═══════════════════════════════════════════════════════════════════
+  function buildCeilingFixtures() {
+    const housingMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1510, roughness: 0.8, metalness: 0.2
+    });
+    const bulbMat = new THREE.MeshStandardMaterial({
+      color: 0xfff5d0,
+      emissive: 0xfff5d0,
+      emissiveIntensity: 2.0,
+      roughness: 0.0,
+      metalness: 0.0
+    });
+    const rimMat = new THREE.MeshStandardMaterial({
+      color: 0xc9a96e, metalness: 0.7, roughness: 0.3
+    });
+
+    ARTWORKS.forEach(art => {
+      const ax = art.position.x;
+      const az = art.position.z;
+
+      // Recessed cylinder housing
+      const housing = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.22, 0.22, 0.18, 16), housingMat
+      );
+      housing.position.set(ax, 7.91, az);
+      scene.add(housing);
+
+      // Gold rim ring
+      const rim = new THREE.Mesh(
+        new THREE.TorusGeometry(0.22, 0.03, 8, 20), rimMat
+      );
+      rim.rotation.x = Math.PI / 2;
+      rim.position.set(ax, 7.83, az);
+      scene.add(rim);
+
+      // Glowing bulb
+      const bulb = new THREE.Mesh(
+        new THREE.SphereGeometry(0.1, 12, 12), bulbMat
+      );
+      bulb.position.set(ax, 7.82, az);
+      scene.add(bulb);
+
+      // Faint light cone visual
+      const coneMat = new THREE.MeshStandardMaterial({
+        color: 0xfff8e0,
+        transparent: true,
+        opacity: 0.04,
+        side: THREE.BackSide
+      });
+      const cone = new THREE.Mesh(
+        new THREE.ConeGeometry(1.8, 5.5, 20, 1, true), coneMat
+      );
+      cone.position.set(ax, 5.0, az);
+      scene.add(cone);
+    });
+  }
+  buildCeilingFixtures();
+
+  // ═══════════════════════════════════════════════════════════════════
+  // AGENT 4 — GLTF LOADER
+  // ═══════════════════════════════════════════════════════════════════
+  let modelsLoaded = 0;
+  const totalModels = ARTWORKS.length;
+
+  function updateLoadingBar() {
+    modelsLoaded++;
+    const pct = (modelsLoaded / totalModels) * 100;
+    document.getElementById('loading-bar').style.width = pct + '%';
+    if (modelsLoaded >= totalModels) {
+      setTimeout(() => {
+        const lo = document.getElementById('loading-overlay');
+        lo.classList.add('hidden');
+        setTimeout(() => lo.style.display = 'none', 1000);
+      }, 400);
+    }
+  }
+
+  const loader = new THREE.GLTFLoader();
+  const dracoLoader = new THREE.DRACOLoader();
+  dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
+  loader.setDRACOLoader(dracoLoader);
+  ARTWORKS.forEach(art => {
+    loader.load(
+      art.model,
+      (gltf) => {
+        const model = gltf.scene;
+        model.traverse(child => {
+          if (child.isMesh) {
+            child.material = new THREE.MeshStandardMaterial({
+              color: 0xf8f5ef,
+              roughness: 0.25,
+              metalness: 0.0,
+              envMapIntensity: 0.5,
+              side: THREE.DoubleSide
+            });
+            child.castShadow = true;
+            child.receiveShadow = true;
+          }
+        });
+        // Step 1 — measure unscaled model with matrices flushed
+        model.updateMatrixWorld(true);
+        const box = new THREE.Box3().setFromObject(model);
+        const size = box.getSize(new THREE.Vector3());
+        const sizeY = Math.max(size.y, 0.001); // guard against zero-height
+        const scale = 1.8 / sizeY;
+        model.scale.setScalar(scale);
+
+        // Step 2 — flush scale into world matrix, then re-measure
+        model.updateMatrixWorld(true);
+        const box2 = new THREE.Box3().setFromObject(model);
+        const center = box2.getCenter(new THREE.Vector3());
+
+        // Step 3 — place model: bottom sits at y=1.4, centred on pedestal
+        model.position.set(
+          art.position.x - center.x,
+          1.4 - box2.min.y,
+          art.position.z - center.z
+        );
+        scene.add(model);
+        art.mesh = model;
+        updateLoadingBar();
+      },
+      undefined,
+      (err) => {
+        console.error('FAILED TO LOAD: ' + art.model, err);
+        const geo = new THREE.CylinderGeometry(0.25, 0.35, 1.6, 16);
+        const mat = new THREE.MeshStandardMaterial({ color: 0xf0ece4, roughness: 0.3, metalness: 0.0 });
+        const fb = new THREE.Mesh(geo, mat);
+        fb.position.set(art.position.x, 2.2, art.position.z);
+        fb.castShadow = true;
+        scene.add(fb);
+        art.mesh = fb;
+        updateLoadingBar();
+      }
+    );
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // AGENT 3 — PLAYER CONTROLLER
+  // ═══════════════════════════════════════════════════════════════════
+  let yaw   = Math.PI;  // facing north
+  let pitch = 0;
+  let isPointerLocked = false;
+  let currentFOV = 72;
+  let panelOpen = false;
+  let nearbyArtwork = null;
+  let museumActive = false;
+
+  const keys = {};
+  document.addEventListener('keydown', e => { keys[e.code] = true; });
+  document.addEventListener('keyup',   e => { keys[e.code] = false; });
+
+  // Pointer lock
+  renderer.domElement.addEventListener('click', () => {
+    if (!museumActive) return;
+    if (!panelOpen) renderer.domElement.requestPointerLock();
+  });
+
+  document.addEventListener('pointerlockchange', () => {
+    isPointerLocked = document.pointerLockElement === renderer.domElement;
+    document.getElementById('crosshair').style.display = isPointerLocked ? 'block' : 'none';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isPointerLocked || panelOpen) return;
+    yaw   -= e.movementX * 0.0016;
+    pitch -= e.movementY * 0.0016;
+    pitch = Math.max(-Math.PI * 5 / 18, Math.min(Math.PI * 5 / 18, pitch));
+  });
+
+  // Key E — open panel  |  Key F — toggle fullscreen
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyE' && nearbyArtwork && !panelOpen) {
+      openPanel(nearbyArtwork);
+    }
+    if (e.code === 'Escape') {
+      if (panelOpen) {
+        closePanel();
+      }
+    }
+    if (e.code === 'KeyF') {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    }
+  });
+
+  // Collision helper
+  function resolveCollision(pos) {
+    // Wall AABB
+    for (const box of COLLISION_BOXES) {
+      if (box.type === 'wall') {
+        const margin = 0.5;
+        if (pos.x > box.minX - margin && pos.x < box.maxX + margin &&
+            pos.z > box.minZ - margin && pos.z < box.maxZ + margin) {
+          // push out on shortest axis
+          const overlapN = box.maxZ + margin - pos.z;
+          const overlapS = pos.z - (box.minZ - margin);
+          const overlapE = box.maxX + margin - pos.x;
+          const overlapW = pos.x - (box.minX - margin);
+          // check if truly inside (not just approaching)
+          if (overlapN > 0 && overlapS > 0 && overlapE > 0 && overlapW > 0) {
+            const minOverlap = Math.min(overlapN, overlapS, overlapE, overlapW);
+            if (minOverlap === overlapN) pos.z = box.maxZ + margin;
+            else if (minOverlap === overlapS) pos.z = box.minZ - margin;
+            else if (minOverlap === overlapE) pos.x = box.maxX + margin;
+            else pos.x = box.minX - margin;
+          }
+        }
+      } else if (box.type === 'cylinder') {
+        const dx = pos.x - box.cx;
+        const dz = pos.z - box.cz;
+        const dist = Math.sqrt(dx * dx + dz * dz);
+        const minDist = box.r + 0.6;
+        if (dist < minDist && dist > 0.001) {
+          const nx = dx / dist;
+          const nz = dz / dist;
+          pos.x = box.cx + nx * minDist;
+          pos.z = box.cz + nz * minDist;
+        }
+      }
+    }
+    // Global room bounds
+    pos.x = Math.max(-24, Math.min(24, pos.x));
+    pos.z = Math.max(-14.5, Math.min(14.5, pos.z));
+    return pos;
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // INFO PANEL
+  // ═══════════════════════════════════════════════════════════════════
+  function openPanel(art) {
+    document.getElementById('panel-number').textContent    = 'OPERA ' + String(art.id).padStart(2, '0') + ' / 06';
+    document.getElementById('panel-title').textContent     = art.title;
+    document.getElementById('panel-year').textContent      = art.year;
+    document.getElementById('panel-location').textContent  = art.location;
+    document.getElementById('panel-material').textContent  = art.material;
+    document.getElementById('panel-committente').textContent = art.committente;
+    document.getElementById('panel-desc').textContent      = art.desc;
+    document.getElementById('panel-emotion').textContent   = art.emotion;
+    document.getElementById('info-panel').classList.add('visible');
+    panelOpen = true;
+    document.exitPointerLock();
+  }
+
+  function closePanel() {
+    document.getElementById('info-panel').classList.remove('visible');
+    panelOpen = false;
+  }
+
+  document.getElementById('panel-close').addEventListener('click', closePanel);
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ENTRANCE SCREEN
+  // ═══════════════════════════════════════════════════════════════════
+  document.getElementById('enter-btn').addEventListener('click', () => {
+    const entrance = document.getElementById('entrance');
+    entrance.style.opacity = '0';
+    setTimeout(() => {
+      entrance.style.display = 'none';
+      document.getElementById('title-watermark').style.display = 'block';
+      document.getElementById('controls-hint').style.display = 'block';
+      document.getElementById('minimap').style.display = 'block';
+      museumActive = true;
+      renderer.domElement.requestPointerLock();
+    }, 1500);
+  });
+
+  // ═══════════════════════════════════════════════════════════════════
+  // MINIMAP
+  // ═══════════════════════════════════════════════════════════════════
+  const minimapCanvas = document.getElementById('minimap-canvas');
+  const minimapCtx = minimapCanvas.getContext('2d');
+
+  function worldToMap(wx, wz) {
+    const mx = ((wx + 25) / 50) * 102 + 4;
+    const mz = ((-wz + 15) / 30) * 102 + 4;
+    return { x: mx, y: mz };
+  }
+
+  function drawMinimap() {
+    const ctx = minimapCtx;
+    ctx.clearRect(0, 0, 110, 110);
+    ctx.fillStyle = '#0a0806';
+    ctx.fillRect(0, 0, 110, 110);
+
+    // Room outline
+    ctx.strokeStyle = '#2a2010';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(4, 4, 102, 102);
+
+    // Columns
+    const colPos = [[-12,-5],[12,-5],[-12,5],[12,5]];
+    ctx.fillStyle = '#3a2a10';
+    colPos.forEach(([cx, cz]) => {
+      const mp = worldToMap(cx, cz);
+      ctx.beginPath();
+      ctx.arc(mp.x, mp.y, 2, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    // Artworks
+    ctx.fillStyle = '#6a5020';
+    ARTWORKS.forEach(art => {
+      const mp = worldToMap(art.position.x, art.position.z);
+      ctx.fillRect(mp.x - 2, mp.y - 1.5, 4, 3);
+    });
+
+    // Player
+    const pp = worldToMap(camera.position.x, camera.position.z);
+    ctx.fillStyle = '#c9a96e';
+    ctx.beginPath();
+    ctx.arc(pp.x, pp.y, 3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Direction line
+    ctx.strokeStyle = '#c9a96e';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pp.x, pp.y);
+    ctx.lineTo(pp.x + Math.sin(yaw) * -7, pp.y + Math.cos(yaw) * -7);
+    ctx.stroke();
+  }
+
+  // ═══════════════════════════════════════════════════════════════════
+  // ANIMATION LOOP
+  // ═══════════════════════════════════════════════════════════════════
+  const clock = new THREE.Clock();
+
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = Math.min(clock.getDelta(), 0.1);
+
+    if (museumActive && !panelOpen) {
+      // Movement
+      const isSprinting = keys['ShiftLeft'] || keys['ShiftRight'];
+      const speed = isSprinting ? 9 : 5;
+      const targetFOV = isSprinting ? 76 : 72;
+      currentFOV += (targetFOV - currentFOV) * 0.1;
+      camera.fov = currentFOV;
+      camera.updateProjectionMatrix();
+
+      const moveX = keys['KeyD'] || keys['ArrowRight'] ? 1 : (keys['KeyA'] || keys['ArrowLeft']  ? -1 : 0);
+      const moveZ = keys['KeyS'] || keys['ArrowDown']  ? 1 : (keys['KeyW'] || keys['ArrowUp']    ? -1 : 0);
+
+      if (moveX !== 0 || moveZ !== 0) {
+        const angle = Math.atan2(moveX, moveZ);
+        const worldAngle = yaw + angle;
+        const velocity = speed * delta;
+        const nx = camera.position.x + Math.sin(worldAngle) * velocity;
+        const nz = camera.position.z + Math.cos(worldAngle) * velocity;
+        const newPos = resolveCollision(new THREE.Vector3(nx, 1.72, nz));
+        camera.position.copy(newPos);
+      }
+
+      camera.rotation.y = yaw;
+      camera.rotation.x = pitch;
+      camera.position.y = 1.72;
+    }
+
+    // Proximity detection
+    let closest = null;
+    let closestDist = Infinity;
+    ARTWORKS.forEach(art => {
+      const dx = camera.position.x - art.position.x;
+      const dz = camera.position.z - art.position.z;
+      const dist = Math.sqrt(dx * dx + dz * dz);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = art;
+      }
+    });
+
+    const prompt = document.getElementById('artwork-prompt');
+    const promptBg = document.getElementById('artwork-prompt-bg');
+    if (museumActive && closestDist < 5.0 && !panelOpen) {
+      nearbyArtwork = closest;
+      prompt.classList.add('visible');
+      promptBg.classList.add('visible');
+    } else {
+      nearbyArtwork = null;
+      prompt.classList.remove('visible');
+      promptBg.classList.remove('visible');
+    }
+
+    // Minimap
+    if (museumActive) drawMinimap();
+
+    renderer.render(scene, camera);
+  }
+
+  animate();
+  </script>
+</body>
+</html>
