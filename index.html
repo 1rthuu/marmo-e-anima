@@ -441,6 +441,67 @@
       width: 0%;
       transition: width 0.3s ease;
     }
+
+    /* ─── WELCOME CARD ─── */
+    #welcome-card {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0.95);
+      width: 500px;
+      max-width: 90vw;
+      background: rgba(12, 9, 5, 0.97);
+      border: 1px solid #3a2e1c;
+      padding: 48px 40px;
+      z-index: 150;
+      font-family: Georgia, serif;
+      opacity: 0;
+      pointer-events: none;
+      transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      text-align: center;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #welcome-card.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    #welcome-title {
+      font-size: 1.35rem;
+      color: #e8d5a3;
+      font-weight: 400;
+      margin-bottom: 24px;
+      letter-spacing: 0.1em;
+    }
+
+    #welcome-desc {
+      font-size: 0.85rem;
+      color: #b5a07a;
+      line-height: 1.9;
+      margin-bottom: 32px;
+    }
+
+    #welcome-close {
+      padding: 12px 36px;
+      background: transparent;
+      border: 1px solid #c9a96e;
+      color: #c9a96e;
+      font-family: Georgia, serif;
+      font-size: 0.75rem;
+      letter-spacing: 0.25em;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    #welcome-close:hover {
+      background: #c9a96e;
+      color: #0a0806;
+    }
   </style>
 </head>
 <body>
@@ -465,7 +526,7 @@
       <div class="entrance-gold-bar"></div>
       <h1>MARMO E ANIMA</h1>
       <p class="subtitle1">Una Mostra su Antonio Canova</p>
-      <p class="subtitle2">Tema: La Bellezza · Cinque capolavori neoclassici</p>
+      <p class="subtitle2">La Bellezza · Cinque capolavori neoclassici</p>
       <button id="enter-btn">[ ENTRA NELLA MOSTRA ]</button>
     </div>
   </div>
@@ -476,7 +537,7 @@
   <div id="controls-hint">
     W A S D — muoviti<br>
     Mouse — guarda<br>
-    E — apri scheda opera<br>
+    E — scheda &nbsp;·&nbsp; T — ispeziona 3D &nbsp;·&nbsp; R — esci ispezione<br>
     F — schermo intero<br>
     ESC — chiudi / sblocca<br>
     Shift — corri
@@ -485,7 +546,7 @@
   <div id="artwork-prompt-bg"></div>
   <div id="artwork-prompt">
     <span class="prompt-key">E</span>
-    <span class="prompt-text">Leggi scheda opera</span>
+    <span class="prompt-text">[ E ] Scheda &nbsp;·&nbsp; [ T ] Ispeziona 3D</span>
   </div>
 
   <div id="crosshair"></div>
@@ -515,10 +576,22 @@
     <div id="panel-emotion">–</div>
   </div>
 
+  <!-- Welcome Card -->
+  <div id="welcome-card">
+    <div class="panel-gold-bar"></div>
+    <div id="welcome-title">BENVENUTI</div>
+    <div id="welcome-desc">
+      Benvenuti in questo museo virtuale dedicato alle opere di Antonio Canova.<br><br>
+      Vi auguriamo un'esperienza immersiva e piacevole tra marmo, luce e anima.
+    </div>
+    <button id="welcome-close">[ INIZIA L'ESPLORAZIONE ]</button>
+  </div>
+
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
   <script>
   'use strict';
@@ -654,7 +727,7 @@
   scene.fog = new THREE.Fog(0x0d0a06, 20, 55);
 
   const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 80);
-  camera.position.set(0, 1.72, 10);
+  camera.position.set(16, 1.72, 0);
   camera.rotation.order = 'YXZ';
 
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -1742,7 +1815,7 @@
   // ═══════════════════════════════════════════════════════════════════
   // AGENT 3 — PLAYER CONTROLLER
   // ═══════════════════════════════════════════════════════════════════
-  let yaw   = Math.PI;  // facing north
+  let yaw   = -Math.PI / 2;  // facing east (toward the grand door)
   let pitch = 0;
   let isPointerLocked = false;
   let currentFOV = 72;
@@ -1774,9 +1847,11 @@
 
   // Key E — open panel  |  Key F — toggle fullscreen
   document.addEventListener('keydown', (e) => {
+    if (e.code === 'KeyR' && inspectActive) { closeInspectView(); return; }
     if (e.code === 'KeyE' && nearbyArtwork && !panelOpen) {
       openPanel(nearbyArtwork);
     }
+    if (e.code === 'KeyT' && nearbyArtwork && !panelOpen && !inspectActive) openInspectView(nearbyArtwork);
     if (e.code === 'Escape') {
       if (panelOpen) {
         closePanel();
@@ -1867,9 +1942,18 @@
       document.getElementById('title-watermark').style.display = 'block';
       document.getElementById('controls-hint').style.display = 'block';
       document.getElementById('minimap').style.display = 'block';
+      
+      // Show welcome card
+      document.getElementById('welcome-card').classList.add('visible');
+    }, 1500);
+  });
+
+  document.getElementById('welcome-close').addEventListener('click', () => {
+    document.getElementById('welcome-card').classList.remove('visible');
+    setTimeout(() => {
       museumActive = true;
       renderer.domElement.requestPointerLock();
-    }, 1500);
+    }, 400); // Wait for transition out
   });
 
   // ═══════════════════════════════════════════════════════════════════
@@ -1996,6 +2080,282 @@
   }
 
   animate();
+
+  // ── 3D INSPECTION SYSTEM ─────────────────────────────────────────────────
+
+  let inspectRenderer = null;
+  let inspectScene    = null;
+  let inspectCamera   = null;
+  let inspectControls = null;
+  let inspectAnimId   = null;
+  let inspectActive   = false;
+  let inspectLoader   = null;
+
+  function openInspectView(art) {
+    if (inspectActive) return;
+    inspectActive = true;
+    document.exitPointerLock();
+    panelOpen = true; // pause museum movement
+
+    // Populate UI
+    document.getElementById('inspect-title').textContent    = art.title;
+    document.getElementById('inspect-meta').textContent     = 'Antonio Canova — Ispezione 3D';
+    document.getElementById('inspect-location').textContent = art.location;
+    document.getElementById('inspect-material').textContent = art.material;
+    document.getElementById('inspect-year').textContent     = art.year;
+
+    const overlay = document.getElementById('inspect-overlay');
+    overlay.style.display = 'flex';
+
+    const canvas = document.getElementById('inspect-canvas');
+
+    // Init renderer
+    inspectRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+    inspectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    inspectRenderer.setSize(window.innerWidth, window.innerHeight);
+    inspectRenderer.toneMapping = THREE.ACESFilmicToneMapping;
+    inspectRenderer.toneMappingExposure = 1.2;
+    inspectRenderer.outputEncoding = THREE.sRGBEncoding;
+    inspectRenderer.shadowMap.enabled = false;
+
+    // Init scene
+    inspectScene = new THREE.Scene();
+    inspectScene.background = new THREE.Color(0x0d0b09);
+    inspectScene.fog = new THREE.Fog(0x0d0b09, 8, 20);
+
+    // Camera
+    inspectCamera = new THREE.PerspectiveCamera(
+      50, window.innerWidth / window.innerHeight, 0.01, 50
+    );
+    inspectCamera.position.set(0, 1.5, 4);
+
+    // OrbitControls
+    inspectControls = new THREE.OrbitControls(inspectCamera, canvas);
+    inspectControls.enableDamping    = true;
+    inspectControls.dampingFactor    = 0.06;
+    inspectControls.minDistance      = 0.3;
+    inspectControls.maxDistance      = 12;
+    inspectControls.target.set(0, 1.0, 0);
+    inspectControls.update();
+
+    // Lighting — studio 3-point setup
+    const keyLight = new THREE.DirectionalLight(0xfff8e8, 2.2);
+    keyLight.position.set(3, 5, 3);
+    inspectScene.add(keyLight);
+
+    const fillLight = new THREE.DirectionalLight(0xd0e8ff, 0.8);
+    fillLight.position.set(-4, 3, -2);
+    inspectScene.add(fillLight);
+
+    const rimLight = new THREE.DirectionalLight(0xffeedd, 0.6);
+    rimLight.position.set(0, 1, -5);
+    inspectScene.add(rimLight);
+
+    const ambient = new THREE.AmbientLight(0x2a2010, 1.0);
+    inspectScene.add(ambient);
+
+    // Floor disc
+    const floorGeo = new THREE.CircleGeometry(3, 48);
+    const floorMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1510, roughness: 0.9, metalness: 0.0
+    });
+    const floor = new THREE.Mesh(floorGeo, floorMat);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0;
+    inspectScene.add(floor);
+
+    // Subtle pedestal
+    const pedGeo = new THREE.BoxGeometry(1.4, 0.08, 1.4);
+    const pedMat = new THREE.MeshStandardMaterial({
+      color: 0x2a2520, roughness: 0.5, metalness: 0.1
+    });
+    inspectScene.add(new THREE.Mesh(pedGeo, pedMat));
+
+    // Load model WITH original textures (no material override)
+    if (!inspectLoader) {
+      inspectLoader = new THREE.GLTFLoader();
+      const iDraco = new THREE.DRACOLoader();
+      iDraco.setDecoderPath(
+        'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/'
+      );
+      inspectLoader.setDRACOLoader(iDraco);
+    }
+
+    // Loading indicator
+    const loadDiv = document.createElement('div');
+    loadDiv.id = 'inspect-loading';
+    loadDiv.style.cssText = `
+      position:absolute; inset:0; display:flex; align-items:center;
+      justify-content:center; color:#c9a96e; font-family:Georgia,serif;
+      font-size:0.85rem; letter-spacing:0.3em; z-index:20;
+      background:#0d0b09;
+    `;
+    loadDiv.textContent = 'CARICAMENTO...';
+    overlay.appendChild(loadDiv);
+
+    inspectLoader.load(
+      art.model,
+      (gltf) => {
+        // Remove loading screen
+        const ld = document.getElementById('inspect-loading');
+        if (ld) ld.remove();
+
+        const model = gltf.scene;
+
+        // Keep original materials; override to white marble for Le Tre Grazie (id 2)
+        model.traverse(child => {
+          if (child.isMesh) {
+            child.castShadow    = false;
+            child.receiveShadow = false;
+            if (art.id === 2) {
+              child.material = new THREE.MeshStandardMaterial({
+                color: 0xf5f2ec,
+                roughness: 0.3,
+                metalness: 0.0,
+                side: THREE.DoubleSide
+              });
+            } else {
+              if (child.material) {
+                child.material.side = THREE.DoubleSide;
+                child.material.needsUpdate = true;
+              }
+            }
+          }
+        });
+
+        // Auto-scale to fit nicely in view
+        const box    = new THREE.Box3().setFromObject(model);
+        const size   = box.getSize(new THREE.Vector3());
+        const maxDim = Math.max(size.x, size.y, size.z);
+        const scale  = 2.2 / maxDim;
+        model.scale.setScalar(scale);
+
+        // Center on pedestal
+        const box2   = new THREE.Box3().setFromObject(model);
+        const center = box2.getCenter(new THREE.Vector3());
+        model.position.set(
+          -center.x,
+          0.05 - box2.min.y,
+          -center.z
+        );
+
+        inspectScene.add(model);
+
+        // Adjust camera target to model center height
+        const modelHeight = (box2.max.y - box2.min.y) * 0.5;
+        inspectControls.target.set(0, modelHeight * 0.5, 0);
+        inspectCamera.position.set(0, modelHeight * 0.6, maxDim * scale * 2.5);
+        inspectControls.update();
+      },
+      undefined,
+      (err) => {
+        const ld = document.getElementById('inspect-loading');
+        if (ld) ld.textContent = 'Modello non disponibile';
+        console.warn('Inspect load failed:', err);
+      }
+    );
+
+    // Animate loop
+    function inspectLoop() {
+      inspectAnimId = requestAnimationFrame(inspectLoop);
+      inspectControls.update();
+      inspectRenderer.render(inspectScene, inspectCamera);
+    }
+    inspectLoop();
+
+    // Resize handler
+    window._inspectResize = () => {
+      inspectCamera.aspect = window.innerWidth / window.innerHeight;
+      inspectCamera.updateProjectionMatrix();
+      inspectRenderer.setSize(window.innerWidth, window.innerHeight);
+    };
+    window.addEventListener('resize', window._inspectResize);
+  }
+
+  function closeInspectView() {
+    if (!inspectActive) return;
+    inspectActive = false;
+    panelOpen = false;
+
+    cancelAnimationFrame(inspectAnimId);
+    window.removeEventListener('resize', window._inspectResize);
+
+    if (inspectRenderer) {
+      inspectRenderer.dispose();
+      inspectRenderer = null;
+    }
+    if (inspectControls) {
+      inspectControls.dispose();
+      inspectControls = null;
+    }
+    inspectScene  = null;
+    inspectCamera = null;
+
+    const overlay = document.getElementById('inspect-overlay');
+    overlay.style.display = 'none';
+
+    // Remove any leftover loading div
+    const ld = document.getElementById('inspect-loading');
+    if (ld) ld.remove();
+  }
+
   </script>
+
+<div id="inspect-overlay" style="
+  position: fixed; inset: 0; z-index: 50;
+  background: #0d0b09;
+  display: none;
+  flex-direction: column;
+">
+  <!-- Top bar -->
+  <div style="
+    position: absolute; top: 0; left: 0; right: 0;
+    padding: 18px 28px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+    z-index: 10; pointer-events: none;
+  ">
+    <div>
+      <div id="inspect-title" style="
+        color: #e8d5a3; font-family: Georgia, serif;
+        font-size: 1.4rem; font-weight: 400;
+      "></div>
+      <div id="inspect-meta" style="
+        color: #8a7250; font-family: Georgia, serif;
+        font-size: 0.78rem; font-style: italic; margin-top: 4px;
+      "></div>
+    </div>
+    <div style="color: #4a3d28; font-family: Georgia, serif; font-size: 0.72rem; letter-spacing: 0.2em; pointer-events: auto;">
+      Orbita: click + trascina &nbsp;·&nbsp; Zoom: scroll &nbsp;·&nbsp; Pan: click destro
+      <br>
+      <span style="color: #c9a96e">[ R ] per uscire</span>
+    </div>
+  </div>
+
+  <!-- 3D canvas -->
+  <canvas id="inspect-canvas" style="width:100%;height:100%;display:block;"></canvas>
+
+  <!-- Bottom info bar -->
+  <div style="
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 16px 28px;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    z-index: 10; pointer-events: none;
+    display: flex; gap: 40px;
+  ">
+    <div>
+      <div style="color: #5a4a30; font-family: Georgia; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 4px;">Collocazione</div>
+      <div id="inspect-location" style="color: #b5a07a; font-family: Georgia; font-size: 0.78rem;"></div>
+    </div>
+    <div>
+      <div style="color: #5a4a30; font-family: Georgia; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 4px;">Materiale</div>
+      <div id="inspect-material" style="color: #b5a07a; font-family: Georgia; font-size: 0.78rem;"></div>
+    </div>
+    <div>
+      <div style="color: #5a4a30; font-family: Georgia; font-size: 0.6rem; letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 4px;">Anno</div>
+      <div id="inspect-year" style="color: #b5a07a; font-family: Georgia; font-size: 0.78rem;"></div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
