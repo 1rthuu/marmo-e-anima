@@ -1100,6 +1100,52 @@
       np.position.set(art.position.x, 0.8, art.position.z + npOffset);
       if (art.row === 'south') np.rotation.y = Math.PI; // face north
       scene.add(np);
+
+      // Canvas text label on nameplate
+      const npCanvas = document.createElement('canvas');
+      npCanvas.width = 512;
+      npCanvas.height = 96;
+      const npCtx = npCanvas.getContext('2d');
+
+      // Background transparent
+      npCtx.clearRect(0, 0, 512, 96);
+
+      // Gold background matching nameplate
+      npCtx.fillStyle = '#c9a030';
+      npCtx.fillRect(0, 0, 512, 96);
+
+      // Thin darker border
+      npCtx.strokeStyle = '#8a6020';
+      npCtx.lineWidth = 4;
+      npCtx.strokeRect(6, 6, 500, 84);
+
+      // Title text
+      npCtx.fillStyle = '#0a0500';
+      npCtx.textAlign = 'center';
+      npCtx.textBaseline = 'middle';
+
+      // Fit text — use smaller font if title is long
+      const npTitle = art.title;
+      const fontSize = npTitle.length > 25 ? 26 : npTitle.length > 18 ? 30 : 34;
+      npCtx.shadowColor = 'rgba(255,255,255,0.3)';
+      npCtx.shadowBlur = 2;
+      npCtx.font = `italic ${fontSize}px Georgia, serif`;
+      npCtx.fillText(npTitle, 256, 48);
+
+      const npTexture = new THREE.CanvasTexture(npCanvas);
+      const npLabelGeo = new THREE.PlaneGeometry(0.92, 0.145);
+      const npLabelMat = new THREE.MeshBasicMaterial({
+        map: npTexture,
+        transparent: false,
+        depthWrite: true
+      });
+      const npLabel = new THREE.Mesh(npLabelGeo, npLabelMat);
+
+      // Position the label plane just in front of the gold nameplate face
+      const labelZOffset = art.row === 'south' ? -0.78 - 0.032 : 0.78 + 0.032;
+      npLabel.position.set(art.position.x, 0.8, art.position.z + labelZOffset);
+      if (art.row === 'south') npLabel.rotation.y = Math.PI;
+      scene.add(npLabel);
     });
 
     // — Picture frames on wall behind each sculpture —
@@ -1118,8 +1164,11 @@
       const frameGroup = new THREE.Group();
       const isNorth = art.row === 'north';
       const wallZ = isNorth ? -14.82 : 14.82;
-      // Raised to y=5.0 so larger frame clears the sculpture tops
-      frameGroup.position.set(art.position.x, 5.0, wallZ);
+      // Push outer frames (x=±9) 1.5 m further out for breathing room between frames
+      const frameX = art.position.x !== 0
+        ? art.position.x + (art.position.x > 0 ? 1.5 : -1.5)
+        : 0;
+      frameGroup.position.set(frameX, 5.0, wallZ);
       frameGroup.rotation.y = isNorth ? 0 : Math.PI;
 
       // Outer gold frame — top, bottom, left, right
@@ -1178,6 +1227,163 @@
     makeBaseboard(50.3, 0.04,  0,  15);
     makeBaseboard(0.04, 30.3, 25,   0);
     makeBaseboard(0.04, 30.3,-25,   0);
+
+    // ── EMERGENCY EXIT DOOR (south wall, x = -18) ───────────────────────────
+
+    const edZ2 = 14.85;
+    const edX2 = -18.0;
+
+    const emerMat2   = new THREE.MeshStandardMaterial({ color: 0xdddbd5, roughness: 0.6, metalness: 0.1 });
+    const emerBar2   = new THREE.MeshStandardMaterial({ color: 0xcc2200, roughness: 0.4, metalness: 0.3 });
+    const emerSign2  = new THREE.MeshStandardMaterial({ color: 0x1a7a2a, roughness: 0.5, metalness: 0.0, emissive: 0x0a3a10, emissiveIntensity: 0.5 });
+    const emerFrame2 = new THREE.MeshStandardMaterial({ color: 0x888880, roughness: 0.5, metalness: 0.2 });
+
+    // Door frame
+    const dfTop2 = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.12, 0.12), emerFrame2);
+    dfTop2.position.set(edX2, 3.26, edZ2);
+    scene.add(dfTop2);
+    [-1.5, 1.5].forEach(xo => {
+      const dfSide2 = new THREE.Mesh(new THREE.BoxGeometry(0.12, 3.4, 0.12), emerFrame2);
+      dfSide2.position.set(edX2 + xo, 1.6, edZ2);
+      scene.add(dfSide2);
+    });
+
+    // Two door leaves
+    [-0.73, 0.73].forEach(xo => {
+      const leaf2 = new THREE.Mesh(new THREE.BoxGeometry(1.34, 3.1, 0.1), emerMat2);
+      leaf2.position.set(edX2 + xo, 1.55, edZ2);
+      scene.add(leaf2);
+      [0.9, 0.25, -0.55].forEach(py => {
+        const panel2 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.55, 0.06),
+          new THREE.MeshStandardMaterial({ color: 0xc8c6c0, roughness: 0.7 }));
+        panel2.position.set(edX2 + xo, py + 0.65, edZ2 - 0.02);
+        scene.add(panel2);
+      });
+    });
+
+    // Red panic bar
+    const pushBar2 = new THREE.Mesh(new THREE.BoxGeometry(2.6, 0.1, 0.12), emerBar2);
+    pushBar2.position.set(edX2, 1.05, edZ2 - 0.04);
+    scene.add(pushBar2);
+    [-1.25, 1.25].forEach(xo => {
+      const brkt2 = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.22, 0.12), emerBar2);
+      brkt2.position.set(edX2 + xo, 1.05, edZ2 - 0.01);
+      scene.add(brkt2);
+    });
+
+    // Green exit sign
+    const exitSign2 = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.28, 0.06), emerSign2);
+    exitSign2.position.set(edX2, 3.55, edZ2);
+    scene.add(exitSign2);
+
+    // USCITA DI EMERGENZA canvas label
+    const udeCanvas2 = document.createElement('canvas');
+    udeCanvas2.width = 512; udeCanvas2.height = 96;
+    const udeCtx2 = udeCanvas2.getContext('2d');
+    udeCtx2.fillStyle = '#1a7a2a';
+    udeCtx2.fillRect(0, 0, 512, 96);
+    udeCtx2.fillStyle = '#ffffff';
+    udeCtx2.font = 'bold 22px Arial, sans-serif';
+    udeCtx2.textAlign = 'center';
+    udeCtx2.textBaseline = 'middle';
+    udeCtx2.fillText('USCITA DI EMERGENZA', 256, 42);
+    udeCtx2.font = '16px Arial';
+    udeCtx2.fillText('MANIGLIONE ANTIPANICO', 256, 72);
+    const udeLabel2 = new THREE.Mesh(
+      new THREE.PlaneGeometry(1.3, 0.24),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(udeCanvas2) })
+    );
+    udeLabel2.position.set(edX2, 3.55, edZ2 - 0.04);
+    scene.add(udeLabel2);
+
+    // Steps
+    const edStep2 = new THREE.Mesh(new THREE.BoxGeometry(3.1, 0.1, 0.3),
+      new THREE.MeshStandardMaterial({ color: 0xd4cfc4, roughness: 0.7 }));
+    edStep2.position.set(edX2, 0.05, edZ2 - 0.2);
+    scene.add(edStep2);
+
+    // Yellow hazard floor stripe
+    const hazardCanvas2 = document.createElement('canvas');
+    hazardCanvas2.width = 256; hazardCanvas2.height = 64;
+    const hCtx2 = hazardCanvas2.getContext('2d');
+    for (let i = 0; i < 8; i++) {
+      hCtx2.fillStyle = i % 2 === 0 ? '#f0c020' : '#1a1a1a';
+      hCtx2.fillRect(i * 32, 0, 32, 64);
+    }
+    const hazard2 = new THREE.Mesh(
+      new THREE.PlaneGeometry(3.0, 0.8),
+      new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(hazardCanvas2), transparent: true, opacity: 0.85 })
+    );
+    hazard2.rotation.x = -Math.PI / 2;
+    hazard2.position.set(edX2, 0.003, edZ2 - 0.6);
+    scene.add(hazard2);
+
+    // ── FIRE EXTINGUISHER (next to emergency door, z = 10.2) ──────────────────
+
+    const extRed    = new THREE.MeshStandardMaterial({ color: 0xcc1100, roughness: 0.35, metalness: 0.3 });
+    const extBlack  = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.2 });
+    const extSilver = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.3, metalness: 0.6 });
+
+    const exX = -20.2;
+    const exZ = 14.7;
+
+    // Wall bracket (metal) — south wall, depth along Z
+    const brktBack = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.7, 0.1), extSilver);
+    brktBack.position.set(exX, 1.35, exZ);
+    scene.add(brktBack);
+    [-0.28, 0.28].forEach(yo => {
+      const brktArm = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.25), extSilver);
+      brktArm.position.set(exX, 1.35 + yo, exZ - 0.1);
+      scene.add(brktArm);
+    });
+
+    // Main cylinder body
+    const extBody = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.1, 0.7, 16), extRed);
+    extBody.position.set(exX, 1.25, exZ - 0.18);
+    extBody.castShadow = true;
+    scene.add(extBody);
+
+    // Top neck
+    const extNeck = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.08, 0.1, 12), extSilver);
+    extNeck.position.set(exX, 1.65, exZ - 0.18);
+    scene.add(extNeck);
+
+    // Handle / valve
+    const extValve = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.04, 0.18), extBlack);
+    extValve.position.set(exX, 1.76, exZ - 0.18);
+    scene.add(extValve);
+
+    // Nozzle hose
+    const extHose = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.28, 8), extBlack);
+    extHose.rotation.z = Math.PI / 3;
+    extHose.position.set(exX, 1.58, exZ - 0.06);
+    scene.add(extHose);
+
+    // Bottom base cap
+    const extBase = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.06, 16), extBlack);
+    extBase.position.set(exX, 0.87, exZ - 0.18);
+    scene.add(extBase);
+
+    // Red label with "ESTINTORE" canvas text — faces north (into room)
+    const estCanvas = document.createElement('canvas');
+    estCanvas.width = 256; estCanvas.height = 128;
+    const estCtx = estCanvas.getContext('2d');
+    estCtx.fillStyle = '#cc1100';
+    estCtx.fillRect(0, 0, 256, 128);
+    estCtx.fillStyle = '#ffffff';
+    estCtx.font = 'bold 26px Arial, sans-serif';
+    estCtx.textAlign = 'center';
+    estCtx.textBaseline = 'middle';
+    estCtx.fillText('ESTINTORE', 128, 50);
+    estCtx.font = '18px Arial, sans-serif';
+    estCtx.fillText('a polvere', 128, 88);
+    const estLabel = new THREE.Mesh(
+      new THREE.PlaneGeometry(0.36, 0.18),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(estCanvas) })
+    );
+    estLabel.rotation.y = 0;
+    estLabel.position.set(exX, 1.75, exZ - 0.04);
+    scene.add(estLabel);
 
   })();
 
