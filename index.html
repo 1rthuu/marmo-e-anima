@@ -581,9 +581,139 @@
     <div class="panel-gold-bar"></div>
     <div id="welcome-title">BENVENUTI</div>
     <div id="welcome-desc">
-      Benvenuti in questo museo virtuale dedicato alle opere di Antonio Canova.<br><br>
+      Benvenuti in questo museo virtuale dedicato alle opere di Antonio Canova.<br>
       Vi auguriamo un'esperienza immersiva e piacevole tra marmo, luce e anima.
     </div>
+
+    <div style="
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, #3a2e1c, transparent);
+      margin: 20px 0 18px;
+    "></div>
+
+    <div style="
+      font-size: 0.62rem;
+      letter-spacing: 0.3em;
+      color: #c9a96e;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      font-family: Georgia, serif;
+    ">GUIDA AI CONTROLLI</div>
+
+    <div style="
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px 28px;
+      width: 100%;
+      margin-bottom: 6px;
+    ">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          min-width:32px; height:32px; padding: 0 8px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.75rem;
+          letter-spacing: 0.05em;
+          flex-shrink: 0;
+        ">W A S D</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Muoviti</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          min-width:32px; height:32px; padding: 0 8px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.75rem;
+          flex-shrink: 0;
+        ">Mouse</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Guarda intorno</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          width:32px; height:32px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.85rem;
+          flex-shrink: 0;
+        ">E</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Scheda opera</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          width:32px; height:32px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.85rem;
+          flex-shrink: 0;
+        ">T</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Ispeziona in 3D</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          width:32px; height:32px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.85rem;
+          flex-shrink: 0;
+        ">R</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Esci dall'ispezione</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          width:32px; height:32px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.85rem;
+          flex-shrink: 0;
+        ">F</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Schermo intero</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          min-width:32px; height:32px; padding: 0 8px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.75rem;
+          flex-shrink: 0;
+        ">Shift</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Corri</span>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="
+          display:inline-flex; align-items:center; justify-content:center;
+          min-width:32px; height:32px; padding: 0 8px;
+          border: 1px solid #c9a96e;
+          color: #c9a96e;
+          font-family: Georgia, serif;
+          font-size: 0.75rem;
+          flex-shrink: 0;
+        ">ESC</span>
+        <span style="color:#b5a07a; font-family:Georgia,serif; font-size:0.78rem;">Chiudi / sblocca mouse</span>
+      </div>
+    </div>
+
     <button id="welcome-close">[ INIZIA L'ESPLORAZIONE ]</button>
   </div>
 
@@ -1857,7 +1987,7 @@
         closePanel();
       }
     }
-    if (e.code === 'KeyF') {
+    if (e.code === 'KeyF' && !inspectActive) {
       if (!document.fullscreenElement) {
         document.documentElement.requestFullscreen().catch(() => {});
       } else {
