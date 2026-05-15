@@ -526,7 +526,7 @@
       <div class="entrance-gold-bar"></div>
       <h1>MARMO E ANIMA</h1>
       <p class="subtitle1">Una Mostra su Antonio Canova</p>
-      <p class="subtitle2">La Bellezza · Cinque capolavori neoclassici</p>
+      <p class="subtitle2">La Bellezza · Cinque capolavori neoclassici + un'opera contemporanea</p>
       <button id="enter-btn">[ ENTRA NELLA MOSTRA ]</button>
     </div>
   </div>
@@ -722,6 +722,8 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
 
   <script>
   'use strict';
@@ -864,11 +866,32 @@
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFShadowMap;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.82;
+  renderer.toneMappingExposure = 0.95;
   renderer.outputEncoding = THREE.sRGBEncoding;
   document.body.appendChild(renderer.domElement);
+
+  // Load HDR environment map for realistic PBR lighting
+  const pmremGenerator = new THREE.PMREMGenerator(renderer);
+  pmremGenerator.compileEquirectangularShader();
+
+  new THREE.RGBELoader()
+    .load('hdri/studio.hdr', function(texture) {
+      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
+      scene.environment = envMap;  // applies reflections to ALL materials
+      texture.dispose();
+      pmremGenerator.dispose();
+    },
+    undefined,
+    function(err) {
+      // Fallback: generate a simple procedural environment
+      const pmrem2 = new THREE.PMREMGenerator(renderer);
+      pmrem2.compileEquirectangularShader();
+      const rt = pmrem2.fromScene(new THREE.RoomEnvironment());
+      scene.environment = rt.texture;
+      pmrem2.dispose();
+    });
 
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -945,7 +968,7 @@
     // — Floor —
     const floorGeo = new THREE.PlaneGeometry(50, 30);
     const floorMat = new THREE.MeshStandardMaterial({
-      color: 0xe8e2d4, roughness: 0.2, metalness: 0.05
+      color: 0xe8e2d4, roughness: 0.18, metalness: 0.05, envMapIntensity: 0.3
     });
     const floor = new THREE.Mesh(floorGeo, floorMat);
     floor.rotation.x = -Math.PI / 2;
@@ -1893,11 +1916,14 @@
         const model = gltf.scene;
         model.traverse(child => {
           if (child.isMesh) {
-            child.material = new THREE.MeshStandardMaterial({
-              color: 0xf8f5ef,
-              roughness: 0.25,
+            child.material = new THREE.MeshPhysicalMaterial({
+              color: 0xf5f2ec,
+              roughness: 0.12,
               metalness: 0.0,
-              envMapIntensity: 0.5,
+              clearcoat: 0.4,
+              clearcoatRoughness: 0.08,
+              envMapIntensity: 1.2,
+              reflectivity: 0.3,
               side: THREE.DoubleSide
             });
             child.castShadow = true;
@@ -1931,7 +1957,10 @@
       (err) => {
         console.error('FAILED TO LOAD: ' + art.model, err);
         const geo = new THREE.CylinderGeometry(0.25, 0.35, 1.6, 16);
-        const mat = new THREE.MeshStandardMaterial({ color: 0xf0ece4, roughness: 0.3, metalness: 0.0 });
+        const mat = new THREE.MeshPhysicalMaterial({
+          color: 0xf0ece4, roughness: 0.15, metalness: 0.0,
+          clearcoat: 0.3, clearcoatRoughness: 0.1
+        });
         const fb = new THREE.Mesh(geo, mat);
         fb.position.set(art.position.x, 2.2, art.position.z);
         fb.castShadow = true;
@@ -2338,10 +2367,12 @@
             child.castShadow    = false;
             child.receiveShadow = false;
             if (art.id === 2) {
-              child.material = new THREE.MeshStandardMaterial({
+              child.material = new THREE.MeshPhysicalMaterial({
                 color: 0xf5f2ec,
-                roughness: 0.3,
+                roughness: 0.12,
                 metalness: 0.0,
+                clearcoat: 0.4,
+                clearcoatRoughness: 0.08,
                 side: THREE.DoubleSide
               });
             } else {
