@@ -562,6 +562,7 @@
     <div class="panel-gold-bar"></div>
     <div id="panel-number">OPERA 01 / 06</div>
     <div id="panel-title">–</div>
+    <div id="panel-author" style="font-style:italic;font-size:0.8rem;color:#8a7250;margin-top:2px;">–</div>
     <div id="panel-year">–</div>
     <div id="panel-location">–</div>
     <div id="panel-material">–</div>
@@ -574,6 +575,9 @@
     <div class="panel-divider"></div>
     <span class="panel-label">Emozioni</span>
     <div id="panel-emotion">–</div>
+    <div class="panel-divider"></div>
+    <span class="panel-label">Critica d'Arte</span>
+    <div id="panel-critica" style="font-size:0.78rem;line-height:1.7;color:#b5a07a;">–</div>
   </div>
 
   <!-- Welcome Card -->
@@ -719,112 +723,64 @@
 
   <!-- Exit Door Prompt -->
   <div id="exit-door-prompt" style="
-    position: fixed; bottom: 48px; left: 50%; transform: translateX(-50%);
-    display: none; align-items: center; gap: 12px;
-    font-family: Georgia, serif; white-space: nowrap;
-    z-index: 30; pointer-events: none;
-    animation: prompt-pulse 1.8s ease-in-out infinite;
+    position:fixed; bottom:48px; left:50%; transform:translateX(-50%);
+    display:none; align-items:center; gap:12px;
+    font-family:Georgia,serif; white-space:nowrap; z-index:30;
+    pointer-events:none;
   ">
     <span style="display:inline-flex;align-items:center;justify-content:center;
-      width:36px;height:36px;border:1.5px solid #1a7a2a;color:#1a7a2a;
-      font-family:Georgia,serif;font-size:1rem;">E</span>
-    <span style="font-size:0.85rem;letter-spacing:0.28em;color:#e8d5a3;
-      text-transform:uppercase;">EXIT</span>
+      width:36px;height:36px;border:1.5px solid #1a7a2a;color:#1a7a2a;font-size:1rem;">E</span>
+    <span style="font-size:0.85rem;letter-spacing:0.28em;color:#e8d5a3;text-transform:uppercase;">EXIT</span>
   </div>
 
-  <!-- Exit Quiz Overlay -->
+  <!-- Exit Overlay -->
   <div id="exit-overlay" style="
-    position: fixed; inset: 0; z-index: 200;
-    background: rgba(5,3,2,0.88);
-    display: none; align-items: center; justify-content: center;
-    backdrop-filter: blur(6px);
+    position:fixed;inset:0;z-index:200;background:rgba(5,3,2,0.88);
+    display:none;align-items:center;justify-content:center;
   ">
-    <div id="exit-step1" style="
-      background: #0d0a06; border: 1px solid #3a2e1c;
-      padding: 52px 64px; max-width: 560px; width: 90%;
-      text-align: center; font-family: Georgia, serif;
-    ">
+    <div id="exit-step1" style="background:#0d0a06;border:1px solid #3a2e1c;
+      padding:52px 64px;max-width:560px;width:90%;text-align:center;font-family:Georgia,serif;">
       <div style="width:40px;height:1px;background:#c9a96e;margin:0 auto 28px;"></div>
-      <div style="font-size:0.62rem;letter-spacing:0.35em;color:#c9a96e;
-        text-transform:uppercase;margin-bottom:20px;">Uscita dal Museo</div>
+      <div style="font-size:0.62rem;letter-spacing:0.35em;color:#c9a96e;text-transform:uppercase;margin-bottom:20px;">Uscita dal Museo</div>
       <div style="font-size:1.1rem;color:#e8d5a3;line-height:1.6;margin-bottom:36px;">
         Hai terminato il tour del museo virtuale<br>e vuoi uscire?
       </div>
       <div style="display:flex;gap:16px;justify-content:center;">
-        <button id="exit-yes" style="
-          padding:12px 40px;background:transparent;
-          border:1px solid #c9a96e;color:#c9a96e;
-          font-family:Georgia,serif;font-size:0.82rem;
-          letter-spacing:0.25em;cursor:pointer;transition:all 0.3s;
-        ">SI, ESCI</button>
-        <button id="exit-no" style="
-          padding:12px 40px;background:transparent;
-          border:1px solid #3a2e1c;color:#6b5c40;
-          font-family:Georgia,serif;font-size:0.82rem;
-          letter-spacing:0.25em;cursor:pointer;transition:all 0.3s;
-        ">NO, CONTINUA</button>
+        <button id="exit-yes" style="padding:12px 40px;background:transparent;border:1px solid #c9a96e;color:#c9a96e;font-family:Georgia,serif;font-size:0.82rem;letter-spacing:0.25em;cursor:pointer;">SI, ESCI</button>
+        <button id="exit-no"  style="padding:12px 40px;background:transparent;border:1px solid #3a2e1c;color:#6b5c40;font-family:Georgia,serif;font-size:0.82rem;letter-spacing:0.25em;cursor:pointer;">NO, CONTINUA</button>
       </div>
     </div>
-
-    <div id="exit-step2" style="
-      background: #0d0a06; border: 1px solid #3a2e1c;
-      padding: 52px 64px; max-width: 580px; width: 90%;
-      text-align: center; font-family: Georgia, serif; display: none;
-    ">
+    <div id="exit-step2" style="background:#0d0a06;border:1px solid #3a2e1c;
+      padding:52px 64px;max-width:580px;width:90%;text-align:center;font-family:Georgia,serif;display:none;">
       <div style="width:40px;height:1px;background:#c9a96e;margin:0 auto 28px;"></div>
-      <div style="font-size:2rem;margin-bottom:12px;">&#x1F928;</div>
+      <div style="font-size:2rem;margin-bottom:12px;">🤨</div>
       <div style="font-size:1rem;color:#e8d5a3;line-height:1.7;margin-bottom:12px;">
         Perche stai mentendo?<br>
         <span style="color:#c9a96e;font-style:italic;">Non hai ancora letto le recensioni!</span>
       </div>
       <div style="font-size:0.82rem;color:#6b5c40;margin-bottom:32px;">
-        Ogni opera in questo museo ha una critica d'arte scritta apposta per te.<br>
-        Leggile prima di andartene — ne vale la pena.
+        Ogni opera ha una critica d'arte scritta apposta per te.<br>Leggile prima di andartene.
       </div>
       <div style="display:flex;gap:16px;justify-content:center;">
-        <button id="open-recensioni" style="
-          padding:14px 48px;background:transparent;
-          border:1px solid #c9a96e;color:#c9a96e;
-          font-family:Georgia,serif;font-size:0.82rem;
-          letter-spacing:0.25em;cursor:pointer;transition:all 0.3s;
-        ">LEGGI LE RECENSIONI</button>
-        <button id="exit-anyway" style="
-          padding:14px 32px;background:transparent;
-          border:1px solid #2a1e10;color:#3a2e1c;
-          font-family:Georgia,serif;font-size:0.75rem;
-          letter-spacing:0.2em;cursor:pointer;
-        ">esci lo stesso</button>
+        <button id="open-recensioni" style="padding:14px 48px;background:transparent;border:1px solid #c9a96e;color:#c9a96e;font-family:Georgia,serif;font-size:0.82rem;letter-spacing:0.25em;cursor:pointer;">LEGGI LE RECENSIONI</button>
+        <button id="exit-anyway" style="padding:14px 32px;background:transparent;border:1px solid #2a1e10;color:#3a2e1c;font-family:Georgia,serif;font-size:0.75rem;letter-spacing:0.2em;cursor:pointer;">esci lo stesso</button>
       </div>
     </div>
-
-    <div id="exit-step3" style="
-      background: #0d0a06; border: 1px solid #3a2e1c;
-      padding: 40px 52px; max-width: 820px; width: 95%;
-      font-family: Georgia, serif; display: none;
-      max-height: 90vh; overflow-y: auto;
-    ">
+    <div id="exit-step3" style="background:#0d0a06;border:1px solid #3a2e1c;
+      padding:40px 52px;max-width:820px;width:95%;font-family:Georgia,serif;
+      display:none;max-height:90vh;overflow-y:auto;">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
         <div>
           <div style="width:30px;height:1px;background:#c9a96e;margin-bottom:12px;"></div>
           <div style="font-size:0.6rem;letter-spacing:0.35em;color:#c9a96e;text-transform:uppercase;">Catalogo Critico</div>
           <div style="font-size:1.3rem;color:#e8d5a3;margin-top:6px;">Recensioni delle Opere</div>
         </div>
-        <button id="close-recensioni" style="
-          background:transparent;border:1px solid #3a2e1c;
-          color:#6b5c40;padding:8px 20px;
-          font-family:Georgia,serif;font-size:0.75rem;
-          letter-spacing:0.2em;cursor:pointer;
-        ">&#x2715; CHIUDI</button>
+        <button id="close-recensioni" style="background:transparent;border:1px solid #3a2e1c;color:#6b5c40;padding:8px 20px;font-family:Georgia,serif;font-size:0.75rem;letter-spacing:0.2em;cursor:pointer;">x CHIUDI</button>
       </div>
-      <div id="rec-selector" style="
-        display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;
-        padding-bottom:20px;border-bottom:1px solid #2a1e10;
-      "></div>
-      <div id="rec-content" style="
-        color:#b5a07a;font-size:0.88rem;line-height:1.9;min-height:200px;
-      ">
+      <div id="rec-selector" style="display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px;padding-bottom:20px;border-bottom:1px solid #2a1e10;"></div>
+      <div id="rec-content" style="color:#b5a07a;font-size:0.88rem;line-height:1.9;min-height:200px;">
         <div style="color:#4a3d28;font-style:italic;text-align:center;padding:40px 0;">
-          Seleziona un'opera dal catalogo sopra per leggerne la recensione.
+          Seleziona un'opera dal catalogo per leggerne la recensione.
         </div>
       </div>
     </div>
@@ -871,7 +827,10 @@
   const ARTWORKS = [
     // ── NORTH ROW (facing south / toward entrance) ──
     {
-      id: 1, row: 'north', targetHeight: 1.4,
+      id: 1, row: 'north',
+      targetHeight: 1.3,
+      author: "Antonio Canova (1757–1822)",
+      critica: "Canova ferma il tempo nell'attimo prima del bacio: le labbra si avvicinano senza toccarsi, un millimetro di marmo che vale un'eternita. La composizione a X invita a girare attorno alla scultura scoprendo ogni volta un equilibrio nuovo. Levigo il marmo con acqua di rota per ottenere un effetto quasi carnale — il segreto del Neoclassicismo: trasformare la pietra in sentimento.",
       title: "Psiche ravvivata dal bacio di Amore",
       year: "1787–1793",
       location: "Musée du Louvre, Parigi",
@@ -884,7 +843,10 @@
       emotion: "Dolcezza e malinconia — la bellezza dell'amore nel momento in cui sboccia, fragile, prezioso, irripetibile."
     },
     {
-      id: 2, row: 'north', targetHeight: 2.1,
+      id: 2, row: 'north',
+      targetHeight: 2.1,
+      author: "Antonio Canova (1757–1822)",
+      critica: "Tre figure a grandezza naturale da un unico blocco — sfida tecnica mai tentata prima. Canova innovo la tradizione: tutte e tre si rivolgono verso lo spettatore. Ugo Foscolo le dedico il carme incompiuto 'Le Grazie'. I contemporanei scrissero: 'E piu bella della bellezza stessa.' Un'opera che parla di bellezza collettiva, quella che nasce quando le persone si uniscono.",
       title: "Le Tre Grazie",
       year: "1812–1817",
       location: "Museo dell'Ermitage, San Pietroburgo",
@@ -897,7 +859,10 @@
       emotion: "Calore, armonia, senso di completezza. La bellezza del legame tra persone care — quella che non ha bisogno di parole, solo di presenza."
     },
     {
-      id: 3, row: 'north', targetHeight: 2.0,
+      id: 3, row: 'north',
+      targetHeight: 2.0,
+      author: "Antonio Canova (1757–1822)",
+      critica: "Non una dea distante ma una donna colta in un momento intimo: il velo che scende, lo sguardo basso. Creata per sostituire la Venere de' Medici trafugata da Napoleone, Canova rifiuto di farne una copia. Foscolo la descrisse: 'Se la Venere de Medici e bellissima dea, questa e bellissima donna.' La bellezza non come perfezione assoluta, ma come momento umano da rispettare in silenzio.",
       title: "Venere Italica",
       year: "1804–1812",
       location: "Galleria Palatina, Palazzo Pitti, Firenze",
@@ -911,7 +876,10 @@
     },
     // ── SOUTH ROW (facing north / back to entrance) ──
     {
-      id: 4, row: 'south', targetHeight: 2.0,
+      id: 4, row: 'south',
+      targetHeight: 2.0,
+      author: "Antonio Canova (1757–1822)",
+      critica: "Paolina Bonaparte trasformata in Venere vincitrice con il pomo d'oro in mano. Sotto il divano un meccanismo girevole permette rotazione a 360 gradi. Canova applico una patina rosata per simulare l'incarnato. Allo scandalo dei contemporanei Paolina rispose: 'Lo studio era riscaldato.' Un ritratto che vuole essere eterno — e ci e riuscito.",
       title: "Paolina Borghese come Venere vincitrice",
       year: "1804–1808",
       location: "Galleria Borghese, Sala I, Roma",
@@ -924,7 +892,10 @@
       emotion: "Sicurezza, potere, bellezza consapevole di sé. Come se la scultura stesse guardando noi, e non il contrario."
     },
     {
-      id: 5, row: 'south', targetHeight: 2.0,
+      id: 5, row: 'south',
+      targetHeight: 2.0,
+      author: "Antonio Canova (1757–1822)",
+      critica: "La scultura piu leggera di Canova: Ebe sospesa su una nuvola in equilibrio su un solo piede, come colta in un passo di danza. Il panneggio mosso dal vento da velocita e vita alla pietra. Ai critici che contestavano il bronzo dorato rispose: 'Se le avessi dato piu espressione, sarebbe diventata una baccante.' Meno e piu — anche nel marmo.",
       title: "Ebe",
       year: "1796 (completata ~1799)",
       location: "Alte Nationalgalerie, Berlino",
@@ -937,7 +908,10 @@
       emotion: "Leggerezza, gioia e liberta — la bellezza della giovinezza quando ci si sente invincibili e il tempo sembra fermo."
     },
     {
-      id: 6, row: 'south', targetHeight: 0.9,
+      id: 6, row: 'south',
+      targetHeight: 0.65,
+      author: "Henry Moore (1898–1986)",
+      critica: "Moore semplifica il corpo fino all'essenziale: forme morbide che ricordano la natura piu che una persona reale. Se Canova dice 'questo e il corpo perfetto', Moore dice 'questo e cio che rimane quando togli tutto il superfluo.' Non una critica al passato — una domanda: cos'e davvero la bellezza? Quella che si vede o quella che si sente?",
       title: "Reclining Figure",
       year: "1951",
       location: "Collezioni e musei internazionali",
@@ -987,10 +961,9 @@
   renderer.shadowMap.needsUpdate = true;
   document.body.appendChild(renderer.domElement);
 
-  // ── HDR ENVIRONMENT MAP (PBR lighting) ───────────────────────────────
+  // ── HDR ENVIRONMENT MAP ───────────────────────────────────────────
   const pmremGenerator = new THREE.PMREMGenerator(renderer);
   pmremGenerator.compileEquirectangularShader();
-
   new THREE.RGBELoader().load(
     'hdri/studio.hdr',
     (texture) => {
@@ -998,17 +971,14 @@
       scene.environment = envMap;
       texture.dispose();
       pmremGenerator.dispose();
-      console.log('HDR environment loaded');
     },
     undefined,
     () => {
-      // Fallback: procedural RoomEnvironment if HDR file not found
       const pmrem2 = new THREE.PMREMGenerator(renderer);
       pmrem2.compileEquirectangularShader();
       const rt = pmrem2.fromScene(new THREE.RoomEnvironment());
       scene.environment = rt.texture;
       pmrem2.dispose();
-      console.log('Using fallback RoomEnvironment');
     }
   );
 
@@ -1412,8 +1382,8 @@
     }
 
     // — Pedestals —
-    const pedMat = new THREE.MeshStandardMaterial({ color: 0xf2efe8, roughness: 0.35, metalness: 0.05 });
-    const pedTopMat = new THREE.MeshStandardMaterial({ color: 0xfaf8f3, roughness: 0.25, metalness: 0.05 });
+    const pedMat = new THREE.MeshStandardMaterial({ color: 0x2a2520, roughness: 0.5, metalness: 0.1 });
+    const pedTopMat = new THREE.MeshStandardMaterial({ color: 0x3a3530, roughness: 0.4, metalness: 0.1 });
     const nameplateMat = new THREE.MeshStandardMaterial({ color: 0xb89040, metalness: 0.7, roughness: 0.3 });
 
     ARTWORKS.forEach(art => {
@@ -1446,47 +1416,28 @@
       if (art.row === 'south') np.rotation.y = Math.PI; // face north
       scene.add(np);
 
-      // Canvas text label on nameplate
+      // Canvas nameplate text
       const npCanvas = document.createElement('canvas');
-      npCanvas.width = 512;
-      npCanvas.height = 96;
+      npCanvas.width = 512; npCanvas.height = 96;
       const npCtx = npCanvas.getContext('2d');
-
-      // Background transparent
-      npCtx.clearRect(0, 0, 512, 96);
-
-      // Gold background matching nameplate
       npCtx.fillStyle = '#c9a030';
       npCtx.fillRect(0, 0, 512, 96);
-
-      // Thin darker border
       npCtx.strokeStyle = '#8a6020';
       npCtx.lineWidth = 4;
       npCtx.strokeRect(6, 6, 500, 84);
-
-      // Title text
       npCtx.fillStyle = '#0a0500';
       npCtx.textAlign = 'center';
       npCtx.textBaseline = 'middle';
-
-      // Fit text — use smaller font if title is long
       const npTitle = art.title;
-      const fontSize = npTitle.length > 25 ? 26 : npTitle.length > 18 ? 30 : 34;
+      const npFontSize = npTitle.length > 25 ? 22 : npTitle.length > 18 ? 26 : 30;
+      npCtx.font = 'italic ' + npFontSize + 'px Georgia, serif';
       npCtx.shadowColor = 'rgba(255,255,255,0.3)';
       npCtx.shadowBlur = 2;
-      npCtx.font = `italic ${fontSize}px Georgia, serif`;
       npCtx.fillText(npTitle, 256, 48);
-
       const npTexture = new THREE.CanvasTexture(npCanvas);
       const npLabelGeo = new THREE.PlaneGeometry(0.92, 0.145);
-      const npLabelMat = new THREE.MeshBasicMaterial({
-        map: npTexture,
-        transparent: false,
-        depthWrite: true
-      });
+      const npLabelMat = new THREE.MeshBasicMaterial({ map: npTexture });
       const npLabel = new THREE.Mesh(npLabelGeo, npLabelMat);
-
-      // Position the label plane just in front of the gold nameplate face
       const labelZOffset = art.row === 'south' ? -0.78 - 0.032 : 0.78 + 0.032;
       npLabel.position.set(art.position.x, 0.8, art.position.z + labelZOffset);
       if (art.row === 'south') npLabel.rotation.y = Math.PI;
@@ -1776,7 +1727,7 @@
       { wallX: -25, sign: -1, faceAngle:  Math.PI / 2 }
     ].forEach(({ wallX, sign, faceAngle }) => {
       windowZPositions.forEach(wz => {
-        if (wallX === 25 && wz === 0) return; // door is here
+        if (wallX === 25 && wz === 0) return;  // door is here
         if (wallX === -25 && wz === 0) return; // biography panel is here
 
         const faceX  = wallX - sign * (fd / 2);        // stone bars centred here
@@ -1874,158 +1825,185 @@
   }
   buildWindows();
 
-  // ── CANOVA BIOGRAPHY PANEL (west wall, z=0) ──────────────────────────
   (function buildCanovaBiographyPanel() {
-    const wallX = -25;
-    const panelZ = 0;
+    const wallX = -25, panelZ = 0;
 
-    const stoneMat2 = new THREE.MeshStandardMaterial({
-      color: 0xd4cfc4, roughness: 0.65, metalness: 0.02
-    });
-    const goldMat2 = new THREE.MeshStandardMaterial({
-      color: 0xc9a96e, roughness: 0.35, metalness: 0.7
-    });
-    const darkMat = new THREE.MeshStandardMaterial({
-      color: 0x1a1510, roughness: 0.8, metalness: 0.0
-    });
+    const stoneMat2 = new THREE.MeshStandardMaterial({ color: 0xd4cfc4, roughness: 0.65 });
+    const goldMat2  = new THREE.MeshStandardMaterial({ color: 0xc9a96e, metalness: 0.7, roughness: 0.3 });
+    const darkMat2  = new THREE.MeshStandardMaterial({ color: 0x1a1510, roughness: 0.8 });
 
-    // Outer stone frame
-    const pfTop = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 7.5), stoneMat2);
-    pfTop.position.set(wallX + 0.11, 6.8, panelZ);
-    scene.add(pfTop);
-    const pfBot = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.28, 7.5), stoneMat2);
-    pfBot.position.set(wallX + 0.11, 1.3, panelZ);
-    scene.add(pfBot);
-    const pfLeft = new THREE.Mesh(new THREE.BoxGeometry(0.22, 5.78, 0.28), stoneMat2);
-    pfLeft.position.set(wallX + 0.11, 4.05, panelZ - 3.61);
-    scene.add(pfLeft);
-    const pfRight = new THREE.Mesh(new THREE.BoxGeometry(0.22, 5.78, 0.28), stoneMat2);
-    pfRight.position.set(wallX + 0.11, 4.05, panelZ + 3.61);
-    scene.add(pfRight);
-
-    // Gold inner frame border
-    const goldFrameData = [
-      { geo: [0.1, 0.08, 6.9], pos: [wallX + 0.17, 6.5, panelZ] },
-      { geo: [0.1, 0.08, 6.9], pos: [wallX + 0.17, 1.6, panelZ] },
-      { geo: [0.1, 5.0, 0.08], pos: [wallX + 0.17, 4.05, panelZ - 3.35] },
-      { geo: [0.1, 5.0, 0.08], pos: [wallX + 0.17, 4.05, panelZ + 3.35] },
-    ];
-    goldFrameData.forEach(({ geo, pos }) => {
-      const m = new THREE.Mesh(new THREE.BoxGeometry(...geo), goldMat2);
-      m.position.set(...pos);
-      scene.add(m);
+    // Stone outer frame
+    [[0.22, 0.28, 7.5, wallX+0.11, 6.8, panelZ],
+     [0.22, 0.28, 7.5, wallX+0.11, 1.3, panelZ],
+     [0.22, 5.78, 0.28, wallX+0.11, 4.05, panelZ-3.61],
+     [0.22, 5.78, 0.28, wallX+0.11, 4.05, panelZ+3.61]
+    ].forEach(([w,h,d,x,y,z]) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), stoneMat2);
+      m.position.set(x,y,z); scene.add(m);
     });
 
-    // Dark background panel
-    const bgPanel = new THREE.Mesh(
-      new THREE.PlaneGeometry(6.6, 4.85),
-      darkMat
-    );
-    bgPanel.rotation.y = Math.PI / 2;
-    bgPanel.position.set(wallX + 0.2, 4.05, panelZ);
-    scene.add(bgPanel);
+    // Gold inner border
+    [[0.1,0.08,6.9, wallX+0.17,6.5,panelZ],
+     [0.1,0.08,6.9, wallX+0.17,1.6,panelZ],
+     [0.1,5.0,0.08, wallX+0.17,4.05,panelZ-3.35],
+     [0.1,5.0,0.08, wallX+0.17,4.05,panelZ+3.35]
+    ].forEach(([w,h,d,x,y,z]) => {
+      const m = new THREE.Mesh(new THREE.BoxGeometry(w,h,d), goldMat2);
+      m.position.set(x,y,z); scene.add(m);
+    });
 
-    // Canvas text panel with Canova biography
-    const bioCanvas = document.createElement('canvas');
-    bioCanvas.width  = 2048;
-    bioCanvas.height = 1536;
-    const bCtx = bioCanvas.getContext('2d');
+    // Dark background
+    const bg = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 4.85), darkMat2);
+    bg.rotation.y = Math.PI/2;
+    bg.position.set(wallX+0.2, 4.05, panelZ);
+    scene.add(bg);
 
-    bCtx.fillStyle = '#0d0905';
-    bCtx.fillRect(0, 0, 2048, 1536);
+    // Canvas biography text
+    const bc = document.createElement('canvas');
+    bc.width = 2048; bc.height = 1536;
+    const bx = bc.getContext('2d');
 
-    bCtx.strokeStyle = '#c9a96e';
-    bCtx.lineWidth = 3;
-    bCtx.beginPath(); bCtx.moveTo(80, 100); bCtx.lineTo(1968, 100); bCtx.stroke();
+    bx.fillStyle = '#0d0905';
+    bx.fillRect(0, 0, 2048, 1536);
 
-    bCtx.fillStyle = '#c9a96e';
-    bCtx.font = 'bold 72px Georgia, serif';
-    bCtx.textAlign = 'center';
-    bCtx.fillText('ANTONIO CANOVA', 1024, 72);
+    // Title
+    bx.strokeStyle = '#c9a96e'; bx.lineWidth = 3;
+    bx.beginPath(); bx.moveTo(80,110); bx.lineTo(1968,110); bx.stroke();
+    bx.fillStyle = '#c9a96e';
+    bx.font = 'bold 110px Georgia, serif';
+    bx.textAlign = 'center';
+    bx.fillText('ANTONIO CANOVA', 1024, 80);
+    bx.fillStyle = '#7a6040';
+    bx.font = 'italic 54px Georgia, serif';
+    bx.fillText('Possagno, 1 novembre 1757  —  Venezia, 13 ottobre 1822', 1024, 168);
+    bx.strokeStyle = '#c9a96e'; bx.lineWidth = 1;
+    bx.beginPath(); bx.moveTo(80,208); bx.lineTo(1968,208); bx.stroke();
 
-    bCtx.fillStyle = '#7a6040';
-    bCtx.font = 'italic 36px Georgia, serif';
-    bCtx.fillText('Possagno, 1 novembre 1757 — Venezia, 13 ottobre 1822', 1024, 148);
-
-    bCtx.strokeStyle = '#c9a96e';
-    bCtx.lineWidth = 1;
-    bCtx.beginPath(); bCtx.moveTo(80, 175); bCtx.lineTo(1968, 175); bCtx.stroke();
-
-    function wrapBioText(ctx, text, x, y, maxWidth, lineHeight) {
-      const words = text.split(' ');
-      let line = '';
+    function wt(ctx, text, x, y, mw, lh) {
+      const words = text.split(' '); let line = '';
       for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + ' ';
-        if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-          ctx.fillText(line, x, y);
-          line = words[n] + ' ';
-          y += lineHeight;
-        } else {
-          line = testLine;
-        }
+        const t = line + words[n] + ' ';
+        if (ctx.measureText(t).width > mw && n > 0) {
+          ctx.fillText(line, x, y); line = words[n]+' '; y += lh;
+        } else { line = t; }
       }
-      ctx.fillText(line, x, y);
-      return y + lineHeight;
+      ctx.fillText(line, x, y); return y + lh;
     }
-
-    function bioSectionLabel(ctx, text, x, y, colW) {
-      ctx.fillStyle = '#c9a96e';
-      ctx.font = 'bold 28px Georgia, serif';
+    function sl(ctx, text, x, y, cw) {
+      ctx.fillStyle = '#c9a96e'; ctx.font = 'bold 44px Georgia, serif'; ctx.textAlign = 'left';
       ctx.fillText(text.toUpperCase(), x, y);
-      ctx.strokeStyle = '#c9a96e';
-      ctx.lineWidth = 0.8;
-      ctx.beginPath(); ctx.moveTo(x, y + 8); ctx.lineTo(x + colW, y + 8); ctx.stroke();
-      ctx.fillStyle = '#d4c090';
-      ctx.font = '30px Georgia, serif';
-      return y + 52;
+      ctx.strokeStyle = '#c9a96e'; ctx.lineWidth = 0.8;
+      ctx.beginPath(); ctx.moveTo(x, y+10); ctx.lineTo(x+cw, y+10); ctx.stroke();
+      ctx.fillStyle = '#d4c090'; ctx.font = '46px Georgia, serif';
+      return y + 72;
     }
 
-    bCtx.textAlign = 'left';
-    bCtx.fillStyle = '#e8d5a3';
-    bCtx.font = '32px Georgia, serif';
+    const c1=80, c2=1050, cw=930, lh=66;
+    let y1=268, y2=268;
+    bx.textAlign = 'left'; bx.fillStyle = '#d4c090'; bx.font = '46px Georgia, serif';
 
-    const col1X = 100, col2X = 1060, colW = 900, lineH = 48;
-    let y1 = 220, y2 = 220;
+    y1 = sl(bx,'Le Origini',c1,y1,cw);
+    y1 = wt(bx,'Nato a Possagno nel 1757, figlio di un tagliapietre morto quando aveva soli 4 anni. La madre lo abbandona risposandosi. Il nonno Pasino, scalpellino, lo cresce e lo avvia alla scultura. A 11 anni e gia apprendista a Venezia.',c1,y1,cw,lh)+20;
+    y1 = sl(bx,'La Strada per Roma',c1,y1,cw);
+    y1 = wt(bx,'Nel 1779 arriva a Roma con una borsa di studio del Senato veneziano. Studia i marmi antichi ossessivamente. L\'incontro con Gavin Hamilton cambia tutto: abbandona il Barocco e abbraccia il Neoclassicismo. Nel 1787 la tomba di Clemente XIV lo rende celebre in tutta Europa.',c1,y1,cw,lh)+20;
+    y1 = sl(bx,'Il Pensiero',c1,y1,cw);
+    wt(bx,'"Non devo copiare l\'antico, ma gareggiare con esso." Canova credeva che la scultura dovesse trasformare la pietra in vita. Levigava il marmo con acqua e pietra pomice per ore, cercando quella superficie che sembrasse pelle, non pietra.',c1,y1,cw,lh);
 
-    y1 = bioSectionLabel(bCtx, 'Le Origini', col1X, y1, colW);
-    y1 = wrapBioText(bCtx, 'Nato a Possagno nel 1757, figlio di un tagliapietre morto quando aveva soli 4 anni. La madre lo abbandona risposandosi. Il nonno Pasino, scalpellino, lo cresce e lo avvia alla scultura. A 11 anni e gia apprendista a Venezia.', col1X, y1, colW, lineH) + 20;
+    y2 = sl(bx,'Al Servizio dei Potenti',c2,y2,cw);
+    y2 = wt(bx,'Napoleone, i papi, i re d\'Europa — tutti lo vogliono. Ma Canova mantiene la sua indipendenza. Rifiuta di trasferirsi a Parigi come artista di corte. Rifiuta onorificenze. Lavora solo per chi ama, alle sue condizioni.',c2,y2,cw,lh)+20;
+    y2 = sl(bx,'L\'Uomo Dietro il Genio',c2,y2,cw);
+    y2 = wt(bx,'Timido, generoso, solitario. Spende gran parte della sua fortuna per aiutare giovani scultori in difficolta. Non ha mai avuto figli. La sua vita sentimentale rimane un mistero. Suo fratellastro Giovanni lo segue ovunque come segretario e confidente.',c2,y2,cw,lh)+20;
+    y2 = sl(bx,'L\'Ultimo Atto',c2,y2,cw);
+    wt(bx,'Nel 1815 recupera diplomaticamente centinaia di opere d\'arte trafugate da Napoleone dai musei italiani. Muore nel 1822 prima di vedere finita la chiesa nel suo paese natale. Il suo cuore e sepolto a Venezia. La sua mano destra e conservata in un\'urna all\'Accademia di Venezia.',c2,y2,cw,lh);
 
-    y1 = bioSectionLabel(bCtx, 'La Strada per Roma', col1X, y1, colW);
-    y1 = wrapBioText(bCtx, 'Nel 1779 arriva a Roma con una borsa di studio del Senato veneziano. Studia i marmi antichi ossessivamente. L\'incontro con Gavin Hamilton cambia tutto: abbandona il Barocco e abbraccia il Neoclassicismo. Nel 1787 la tomba di Clemente XIV lo rende celebre in tutta Europa.', col1X, y1, colW, lineH) + 20;
+    bx.strokeStyle = '#c9a96e'; bx.lineWidth = 1.5;
+    bx.beginPath(); bx.moveTo(80,1470); bx.lineTo(1968,1470); bx.stroke();
+    bx.fillStyle = '#8a7250'; bx.font = 'italic 44px Georgia, serif'; bx.textAlign = 'center';
+    bx.fillText('"La bellezza e l\'unica cosa che il tempo non riesce a distruggere."', 1024, 1516);
 
-    y1 = bioSectionLabel(bCtx, 'Il Pensiero', col1X, y1, colW);
-    wrapBioText(bCtx, '"Non devo copiare l\'antico, ma gareggiare con esso." Canova credeva che la scultura dovesse trasformare la pietra in vita. Levigava il marmo con acqua e pietra pomice per ore, cercando quella superficie che sembrasse pelle, non pietra.', col1X, y1, colW, lineH);
-
-    y2 = bioSectionLabel(bCtx, 'Al Servizio dei Potenti', col2X, y2, colW);
-    y2 = wrapBioText(bCtx, 'Napoleone, i papi, i re d\'Europa — tutti lo vogliono. Ma Canova mantiene la sua indipendenza. Rifiuta di trasferirsi a Parigi come artista di corte. Rifiuta onorificenze. Lavora solo per chi ama, alle sue condizioni.', col2X, y2, colW, lineH) + 20;
-
-    y2 = bioSectionLabel(bCtx, 'L\'Uomo Dietro il Genio', col2X, y2, colW);
-    y2 = wrapBioText(bCtx, 'Timido, generoso, solitario. Spende gran parte della sua fortuna per aiutare giovani scultori in difficolta. Non ha mai avuto figli. La sua vita sentimentale rimane un mistero. Suo fratellastro Giovanni lo segue ovunque come segretario e confidente.', col2X, y2, colW, lineH) + 20;
-
-    y2 = bioSectionLabel(bCtx, 'L\'Ultimo Atto', col2X, y2, colW);
-    wrapBioText(bCtx, 'Nel 1815 recupera diplomaticamente centinaia di opere d\'arte trafugate da Napoleone dai musei italiani. Muore nel 1822 prima di vedere finita la chiesa che stava costruendo per il suo paese natale. Il suo cuore e sepolto a Venezia. La sua mano destra e conservata in un\'urna all\'Accademia di Venezia.', col2X, y2, colW, lineH);
-
-    bCtx.strokeStyle = '#c9a96e';
-    bCtx.lineWidth = 1.5;
-    bCtx.beginPath(); bCtx.moveTo(80, 1490); bCtx.lineTo(1968, 1490); bCtx.stroke();
-
-    bCtx.fillStyle = '#8a7250';
-    bCtx.font = 'italic 30px Georgia, serif';
-    bCtx.textAlign = 'center';
-    bCtx.fillText('"La bellezza e l\'unica cosa che il tempo non riesce a distruggere."', 1024, 1524);
-
-    const bioTexture = new THREE.CanvasTexture(bioCanvas);
     const bioMesh = new THREE.Mesh(
       new THREE.PlaneGeometry(6.5, 4.8),
-      new THREE.MeshBasicMaterial({ map: bioTexture })
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(bc) })
     );
-    bioMesh.rotation.y = Math.PI / 2;
-    bioMesh.position.set(wallX + 0.22, 4.05, panelZ);
+    bioMesh.rotation.y = Math.PI/2;
+    bioMesh.position.set(wallX+0.22, 4.05, panelZ);
     scene.add(bioMesh);
 
-    const panelLight = new THREE.PointLight(0xfff0d8, 0.5, 8, 2);
-    panelLight.position.set(wallX + 4, 4.5, panelZ);
-    scene.add(panelLight);
+    const pl = new THREE.PointLight(0xfff0d8, 0.5, 8, 2);
+    pl.position.set(wallX+4, 4.5, panelZ);
+    scene.add(pl);
+  })();
+
+  (function buildEmergencyExit() {
+    const edX=-18, edZ=14.85;
+    const emerMat  = new THREE.MeshStandardMaterial({ color: 0xdddbd5, roughness: 0.6 });
+    const emerBar  = new THREE.MeshStandardMaterial({ color: 0xcc2200, roughness: 0.4, metalness: 0.3 });
+    const emerSign = new THREE.MeshStandardMaterial({ color: 0x1a7a2a, roughness: 0.5, emissive: 0x0a3a10, emissiveIntensity: 0.5 });
+    const emerFrame= new THREE.MeshStandardMaterial({ color: 0x888880, roughness: 0.5, metalness: 0.2 });
+
+    // Frame
+    const dfTop = new THREE.Mesh(new THREE.BoxGeometry(3.2,0.12,0.12), emerFrame);
+    dfTop.position.set(edX,3.26,edZ); scene.add(dfTop);
+    [-1.5,1.5].forEach(xo => {
+      const s = new THREE.Mesh(new THREE.BoxGeometry(0.12,3.4,0.12), emerFrame);
+      s.position.set(edX+xo,1.6,edZ); scene.add(s);
+    });
+
+    // Door leaves
+    [-0.73,0.73].forEach(xo => {
+      const leaf = new THREE.Mesh(new THREE.BoxGeometry(1.34,3.1,0.1), emerMat);
+      leaf.position.set(edX+xo,1.55,edZ); scene.add(leaf);
+    });
+
+    // Red panic bar
+    const pb = new THREE.Mesh(new THREE.BoxGeometry(2.6,0.1,0.12), emerBar);
+    pb.position.set(edX,1.05,edZ-0.04); scene.add(pb);
+
+    // Green exit sign
+    const es = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.28,0.06), emerSign);
+    es.position.set(edX,3.55,edZ); scene.add(es);
+
+    // USCITA text label
+    const uc = document.createElement('canvas');
+    uc.width=512; uc.height=96;
+    const ux = uc.getContext('2d');
+    ux.fillStyle='#1a7a2a'; ux.fillRect(0,0,512,96);
+    ux.fillStyle='#ffffff'; ux.font='bold 22px Arial'; ux.textAlign='center'; ux.textBaseline='middle';
+    ux.fillText('USCITA DI EMERGENZA',256,40);
+    ux.font='16px Arial'; ux.fillText('MANIGLIONE ANTIPANICO',256,70);
+    const ul = new THREE.Mesh(new THREE.PlaneGeometry(1.3,0.24),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(uc) }));
+    ul.position.set(edX,3.55,edZ-0.04); scene.add(ul);
+
+    // Yellow hazard strip
+    const hc = document.createElement('canvas');
+    hc.width=256; hc.height=64;
+    const hx = hc.getContext('2d');
+    for(let i=0;i<8;i++){hx.fillStyle=i%2===0?'#f0c020':'#1a1a1a';hx.fillRect(i*32,0,32,64);}
+    const hm = new THREE.Mesh(new THREE.PlaneGeometry(3.0,0.8),
+      new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(hc), transparent:true, opacity:0.85 }));
+    hm.rotation.x=-Math.PI/2; hm.position.set(edX,0.003,edZ-0.6); scene.add(hm);
+
+    // Fire extinguisher
+    const exX=-20.2, exZ=14.7;
+    const extRed = new THREE.MeshStandardMaterial({ color: 0xcc1100, roughness: 0.35, metalness: 0.3 });
+    const extBlk = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.2 });
+    const extSil = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.3, metalness: 0.6 });
+    const eb = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.7,16), extRed);
+    eb.position.set(exX,1.25,exZ-0.18); scene.add(eb);
+    const en = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.08,0.1,12), extSil);
+    en.position.set(exX,1.65,exZ-0.18); scene.add(en);
+    const ev = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.04,0.05), extBlk);
+    ev.position.set(exX,1.76,exZ-0.18); scene.add(ev);
+    const wallSignC = document.createElement('canvas');
+    wallSignC.width=256; wallSignC.height=80;
+    const wsc = wallSignC.getContext('2d');
+    wsc.fillStyle='#cc2200'; wsc.fillRect(0,0,256,80);
+    wsc.fillStyle='#ffffff'; wsc.font='bold 20px Arial'; wsc.textAlign='center'; wsc.textBaseline='middle';
+    wsc.fillText('ESTINTORE',128,40);
+    const ws = new THREE.Mesh(new THREE.PlaneGeometry(0.35,0.11),
+      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(wallSignC) }));
+    ws.position.set(exX,1.75,exZ-0.04); scene.add(ws);
   })();
 
   // ═══════════════════════════════════════════════════════════════════
@@ -2033,19 +2011,52 @@
   // ═══════════════════════════════════════════════════════════════════
   (function buildLighting() {
 
-    // Deep theatrical ambient — barely lit base
+    // Very dim ambient — just enough to kill pure black
     scene.add(new THREE.AmbientLight(0x1a1208, 0.22));
 
-    // Hemisphere — dark warm ceiling, near-black ground
+    // Subtle warm fill from above — does NOT wash out shadows
     const hemi = new THREE.HemisphereLight(0xffe8c0, 0x0a0804, 0.18);
     scene.add(hemi);
 
-    // Ceiling fill lights
+    // Ceiling fill lights — dimmer, tighter range so they don't pollute everything
     const fillPositions = [[-12,7.5,-5],[12,7.5,-5],[-12,7.5,5],[12,7.5,5]];
     fillPositions.forEach(([lx, ly, lz]) => {
       const pt = new THREE.PointLight(0xfff0d8, 0.55, 18, 2);
       pt.position.set(lx, ly, lz);
       scene.add(pt);
+    });
+
+    // Per-sculpture spotlights — direction depends on which row
+    ARTWORKS.forEach(art => {
+      const ax = art.position.x;
+      const az = art.position.z;
+      // North row faces south (+z): spotlight comes from south side (az + offset)
+      // South row faces north (-z): spotlight comes from north side (az - offset)
+      const spotZOffset = art.row === 'south' ? -1.8 : 1.8;
+      const fillXOffset = art.row === 'south' ? -3 : 3;
+      const fillZOffset = art.row === 'south' ? -3 : 3;
+      const rimZOffset  = art.row === 'south' ?  2.2 : -2.2;
+
+      // Main spot: tight cone, high intensity
+      const spot = new THREE.SpotLight(0xfff5d0, 6.0, 18, Math.PI / 10, 0.28, 1.4);
+      spot.position.set(ax, 7.8, az + spotZOffset);
+      spot.target.position.set(ax, 1.2, az);
+      spot.castShadow = false;
+      scene.add(spot);
+      scene.add(spot.target);
+
+      // Warm fill spot from the front side
+      const fill = new THREE.SpotLight(0xffd090, 1.2, 10, Math.PI / 6, 0.6, 2);
+      fill.position.set(ax + fillXOffset, 4, az + fillZOffset);
+      fill.target.position.set(ax, 1.8, az);
+      fill.castShadow = false;
+      scene.add(fill);
+      scene.add(fill.target);
+
+      // Cool rim light from behind — gives depth
+      const rim = new THREE.PointLight(0x8090b0, 0.6, 5, 2);
+      rim.position.set(ax, 3.0, az + rimZOffset);
+      scene.add(rim);
     });
 
     // Column base warm uplight — museum uplighting effect
@@ -2056,7 +2067,7 @@
       scene.add(pt);
     });
 
-    // Corner fill — prevent void in far edges
+    // Minimal corner fill — just prevent total void
     [[-18, 2.5, -10],[18, 2.5, -10],[-18, 2.5, 10],[18, 2.5, 10]].forEach(([lx,ly,lz]) => {
       const pt = new THREE.PointLight(0xffeedd, 0.18, 14, 2);
       pt.position.set(lx, ly, lz);
@@ -2064,6 +2075,19 @@
     });
 
   })();
+
+  // Single global shadow light — 1 shadow pass instead of 6
+  const globalShadow = new THREE.SpotLight(0xfff5d0, 0.0, 50, Math.PI / 3, 0.5, 1);
+  globalShadow.position.set(0, 7.8, -1);
+  globalShadow.target.position.set(0, 0, 0);
+  globalShadow.castShadow = true;
+  globalShadow.shadow.mapSize.set(1024, 1024);
+  globalShadow.shadow.camera.near = 1;
+  globalShadow.shadow.camera.far  = 35;
+  globalShadow.shadow.camera.fov  = 90;
+  globalShadow.shadow.bias = -0.001;
+  scene.add(globalShadow);
+  scene.add(globalShadow.target);
 
   // ═══════════════════════════════════════════════════════════════════
   // CEILING LIGHT FIXTURES
@@ -2125,11 +2149,58 @@
   }
   buildCeilingFixtures();
 
-  // ═══════════════════════════════════════════════════════════════════
-  // AGENT 4 — GLTF LOADER
-  // ═══════════════════════════════════════════════════════════════════
+  (function buildWallFrames() {
+    const outerMat = new THREE.MeshStandardMaterial({
+      color: 0xb89040, metalness: 0.65, roughness: 0.35
+    });
+    const canvasMat = new THREE.MeshStandardMaterial({
+      color: 0x1a1208, roughness: 1.0
+    });
+
+    ARTWORKS.forEach(art => {
+      const ax = art.position.x;
+      const isNorth = art.row === 'north';
+      const wallZ   = isNorth ? -14.82 : 14.82;
+      const facingY = isNorth ? 0 : Math.PI;
+      const fw = 2.2, fh = 2.6, fb = 0.1, ft = 3.8;
+
+      // Canvas backdrop
+      const backdrop = new THREE.Mesh(new THREE.PlaneGeometry(fw, fh), canvasMat);
+      backdrop.rotation.y = facingY;
+      backdrop.position.set(ax, ft, isNorth ? wallZ + 0.04 : wallZ - 0.04);
+      scene.add(backdrop);
+
+      // Frame bars
+      const bars = [
+        { g: [fw + 0.36, fb, fb],    p: [ax, ft + fh / 2 + fb / 2, wallZ] },
+        { g: [fw + 0.36, fb, fb],    p: [ax, ft - fh / 2 - fb / 2, wallZ] },
+        { g: [fb, fh + fb * 2, fb],  p: [ax - fw / 2 - fb / 2, ft, wallZ] },
+        { g: [fb, fh + fb * 2, fb],  p: [ax + fw / 2 + fb / 2, ft, wallZ] },
+      ];
+      bars.forEach(({ g, p }) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(...g), outerMat);
+        m.position.set(...p);
+        if (isNorth) m.rotation.y = 0; else m.rotation.y = Math.PI;
+        scene.add(m);
+      });
+
+      // Load artwork photo if available
+      if (art.pic) {
+        new THREE.TextureLoader().load(art.pic, (tex) => {
+          backdrop.material = new THREE.MeshStandardMaterial({
+            map: tex, roughness: 0.8, metalness: 0.0
+          });
+        });
+      }
+    });
+  })();
+
+  // ── LOD LAZY LOADING SYSTEM ───────────────────────────────────────
   let modelsLoaded = 0;
   const totalModels = ARTWORKS.length;
+  let shadowFrameCount = 0;
+  const _lodForward = new THREE.Vector3();
+  const _lodToArt   = new THREE.Vector3();
 
   function updateLoadingBar() {
     modelsLoaded++;
@@ -2144,116 +2215,34 @@
     }
   }
 
-  // ── LOADER SETUP ──────────────────────────────────────────────────────
   const loader = new THREE.GLTFLoader();
   const dracoLoader = new THREE.DRACOLoader();
-  dracoLoader.setDecoderPath(
-    'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/'
-  );
+  dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/libs/draco/');
   loader.setDRACOLoader(dracoLoader);
 
-  // ── MATERIAL FACTORY ──────────────────────────────────────────────────
+  // Material factory
   function makeMarbleMat(quality) {
     if (quality === 'high') {
       return new THREE.MeshStandardMaterial({
-        color: 0xf5f2ec,
-        roughness: 0.15,
-        metalness: 0.02,
-        envMapIntensity: 1.4,
-        side: THREE.DoubleSide
+        color: 0xf5f2ec, roughness: 0.15, metalness: 0.02,
+        envMapIntensity: 1.4, side: THREE.DoubleSide
       });
     }
     return new THREE.MeshStandardMaterial({
-      color: 0xf5f2ec,
-      roughness: 0.28,
-      metalness: 0.0,
-      envMapIntensity: 0.5,
-      side: THREE.DoubleSide
+      color: 0xf5f2ec, roughness: 0.28, metalness: 0.0,
+      envMapIntensity: 0.5, side: THREE.DoubleSide
     });
   }
 
-  // ── PER-ARTWORK SPOTLIGHTS (high quality, per-statue) ─────────────────
-  function createArtworkLighting(art) {
-    const ax = art.position.x;
-    const az = art.position.z;
-    const isNorth = art.row === 'north';
-    const zOffset = isNorth ? 2.5 : -2.5;
-
-    // Main key spotlight from ceiling
-    const key = new THREE.SpotLight(0xfff5d0, 5.5, 22, Math.PI / 9, 0.3, 1.2);
-    key.position.set(ax, 7.5, az + zOffset);
-    key.target.position.set(ax, 1.8, az);
-    key.castShadow = false;
-    scene.add(key);
-    scene.add(key.target);
-
-    // Fill light from side (softer, no shadows)
-    const fill = new THREE.SpotLight(0xffd090, 1.8, 14, Math.PI / 6, 0.6, 2);
-    fill.position.set(ax + 3, 5, az + zOffset * 0.5);
-    fill.target.position.set(ax, 2.0, az);
-    fill.castShadow = false;
-    scene.add(fill);
-    scene.add(fill.target);
-
-    // Cool rim light from behind (depth/separation)
-    const rim = new THREE.PointLight(0x8090c0, 0.7, 6, 2);
-    rim.position.set(ax, 2.8, isNorth ? az - 1.5 : az + 1.5);
-    scene.add(rim);
-
-    // Warm ground bounce
-    const bounce = new THREE.PointLight(0xffd080, 0.25, 4, 2);
-    bounce.position.set(ax, 0.3, az);
-    scene.add(bounce);
-
-    art._lights = [key, fill, rim, bounce];
-  }
-
-  // Single global shadow-casting light for the whole room
-  const globalShadowLight = new THREE.SpotLight(0xfff5d0, 0.0, 40, Math.PI/4, 0.5, 1);
-  globalShadowLight.position.set(0, 7.8, -2);
-  globalShadowLight.target.position.set(0, 0, 0);
-  globalShadowLight.castShadow = true;
-  globalShadowLight.shadow.mapSize.set(1024, 1024);
-  globalShadowLight.shadow.camera.near = 1;
-  globalShadowLight.shadow.camera.far = 30;
-  globalShadowLight.shadow.camera.fov = 90;
-  globalShadowLight.shadow.bias = -0.001;
-  scene.add(globalShadowLight);
-  scene.add(globalShadowLight.target);
-
-  // ── INIT ARTWORK STATE + PLACEHOLDER ─────────────────────────────────
-  ARTWORKS.forEach(art => {
-    art.loadState = 'idle';
-    art.lodMesh   = null;
-    art.currentMat = null;
-
-    // Placeholder cylinder shown while model loads
-    const ph = new THREE.Mesh(
-      new THREE.CylinderGeometry(0.28, 0.38, 1.7, 20),
-      makeMarbleMat('high')
-    );
-    ph.position.set(art.position.x, 2.05, art.position.z);
-    ph.castShadow = true;
-    scene.add(ph);
-    art.placeholder = ph;
-
-    // Create dedicated lighting per sculpture
-    createArtworkLighting(art);
-
-    // Resolve loading bar immediately — placeholders are ready
-    updateLoadingBar();
-  });
-
-  // ── SCALE AND POSITION MODEL ──────────────────────────────────────────
+  // Place model on pedestal using artwork's targetHeight
   function placeModel(model, art) {
+    const targetH = art.targetHeight || 1.8;
+    model.updateMatrixWorld(true);
     const box    = new THREE.Box3().setFromObject(model);
     const size   = box.getSize(new THREE.Vector3());
-    // Scale by Y (height) — reclining sculptures use a lower targetHeight to get
-    // a natural footprint; upright sculptures scale correctly since Y ≈ max dim.
-    const targetH = art.targetHeight || 1.6;
-    const rawScale = size.y > 0 ? targetH / size.y : 1.0;
-    // Allow wider range for reclining sculptures
-    const scale = Math.min(Math.max(rawScale, 0.25), 2.2);
+    const sizeY  = Math.max(size.y, 0.001);
+    const rawScale = targetH / sizeY;
+    const scale  = Math.min(Math.max(rawScale, 0.25), 1.6);
     model.scale.setScalar(scale);
     model.updateMatrixWorld(true);
     const box2   = new THREE.Box3().setFromObject(model);
@@ -2265,49 +2254,61 @@
     );
   }
 
-  // ── LAZY LOAD A SINGLE MODEL ──────────────────────────────────────────
+  // Init per-artwork state
+  ARTWORKS.forEach(art => {
+    art.loadState  = 'idle';
+    art.lodMesh    = null;
+    art.currentMat = null;
+    // Placeholder cylinder
+    const ph = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.28, 0.38, 1.7, 16),
+      makeMarbleMat('high')
+    );
+    ph.position.set(art.position.x, 2.05, art.position.z);
+    ph.castShadow = true;
+    scene.add(ph);
+    art.placeholder = ph;
+    art.mesh = ph; // so proximity detection works immediately
+  });
+
+  // Load one model
   function loadModel(art) {
     if (art.loadState !== 'idle') return;
     art.loadState = 'loading';
-
     loader.load(
       art.model,
       (gltf) => {
         const model = gltf.scene;
         placeModel(model, art);
-
         const mat = makeMarbleMat('high');
         model.traverse(child => {
           if (child.isMesh) {
-            child.material    = mat;
-            child.castShadow  = true;
+            child.material      = mat;
+            child.castShadow    = true;
             child.receiveShadow = false;
             child.frustumCulled = true;
           }
         });
-
         art.lodMesh    = model;
         art.currentMat = 'high';
         art.loadState  = 'loaded';
-        art.mesh       = model;
-
-        // Hide placeholder, show model
         art.placeholder.visible = false;
+        art.mesh = model;
         scene.add(model);
+        updateLoadingBar();
       },
       undefined,
       (err) => {
         art.loadState = 'error';
-        console.warn('Model load failed:', art.model, err);
+        console.error('FAILED TO LOAD: ' + art.model, err);
+        updateLoadingBar();
       }
     );
   }
 
-  // ── LOD + BACK-HEMISPHERE CULLING (called every frame) ────────────────
+  // LOD + back-hemisphere culling
   function updateLOD() {
     const camPos = camera.position;
-
-    // Camera forward direction from yaw
     _lodForward.set(-Math.sin(yaw), 0, -Math.cos(yaw));
 
     ARTWORKS.forEach(art => {
@@ -2315,87 +2316,56 @@
       const dz   = camPos.z - art.position.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
 
-      // ── BACK-HEMISPHERE CULLING ──────────────────────────────────────
-      // If sculpture is more than ~110° behind camera AND far away → skip
+      // Back-hemisphere culling: hide if far AND behind player
       _lodToArt.set(-dx, 0, -dz).normalize();
       const dot = _lodForward.dot(_lodToArt);
-      const isBehindAndFar = dot < -0.25 && dist > 18;
-
-      if (isBehindAndFar) {
+      if (dot < -0.25 && dist > 18) {
         if (art.placeholder) art.placeholder.visible = false;
         if (art.lodMesh)     art.lodMesh.visible     = false;
         return;
       }
 
-      // ── DISTANCE-BASED LOD ───────────────────────────────────────────
-      if (dist > 18) {
-        // FAR — show model at lowest quality (no detail, simple material)
+      if (dist > 20) {
+        // FAR — very low quality, still visible
         if (art.loadState === 'idle') loadModel(art);
         if (art.loadState === 'loaded' && art.lodMesh) {
-          art.lodMesh.visible     = true;
+          art.lodMesh.visible = true;
           art.placeholder.visible = false;
           if (art.currentMat !== 'far') {
-            const farMat = new THREE.MeshStandardMaterial({
-              color: 0xf5f2ec,
-              roughness: 0.4,
-              metalness: 0.0,
-              envMapIntensity: 0.2,
-              side: THREE.DoubleSide
+            const m = new THREE.MeshStandardMaterial({
+              color: 0xf5f2ec, roughness: 0.4, metalness: 0.0,
+              envMapIntensity: 0.2, side: THREE.DoubleSide
             });
-            art.lodMesh.traverse(c => {
-              if (c.isMesh) c.material = farMat;
-            });
+            art.lodMesh.traverse(c => { if (c.isMesh) c.material = m; });
             art.currentMat = 'far';
           }
-        } else {
-          art.placeholder.visible = true;
-        }
+        } else { art.placeholder.visible = true; }
 
       } else if (dist > 8) {
-        // MEDIUM — standard quality
+        // MEDIUM
         if (art.loadState === 'idle') loadModel(art);
         if (art.loadState === 'loaded' && art.lodMesh) {
-          art.lodMesh.visible     = true;
+          art.lodMesh.visible = true;
           art.placeholder.visible = false;
           if (art.currentMat !== 'medium') {
-            const medMat = new THREE.MeshStandardMaterial({
-              color: 0xf5f2ec,
-              roughness: 0.25,
-              metalness: 0.0,
-              envMapIntensity: 0.6,
-              side: THREE.DoubleSide
-            });
-            art.lodMesh.traverse(c => {
-              if (c.isMesh) c.material = medMat;
-            });
+            const m = makeMarbleMat('medium');
+            art.lodMesh.traverse(c => { if (c.isMesh) c.material = m; });
             art.currentMat = 'medium';
           }
-        } else {
-          art.placeholder.visible = true;
-        }
+        } else { art.placeholder.visible = true; }
 
       } else {
         // CLOSE — full quality
         if (art.loadState === 'idle') loadModel(art);
         if (art.loadState === 'loaded' && art.lodMesh) {
-          art.lodMesh.visible     = true;
+          art.lodMesh.visible = true;
           art.placeholder.visible = false;
           if (art.currentMat !== 'high') {
-            const hiMat = new THREE.MeshStandardMaterial({
-              color: 0xf5f2ec,
-              roughness: 0.15,
-              metalness: 0.02,
-              envMapIntensity: 1.4,
-              side: THREE.DoubleSide
-            });
-            art.lodMesh.traverse(c => {
-              if (c.isMesh) c.material = hiMat;
-            });
+            const m = makeMarbleMat('high');
+            art.lodMesh.traverse(c => { if (c.isMesh) c.material = m; });
             art.currentMat = 'high';
           }
-        } else {
-          art.placeholder.visible = dist < 8;
-        }
+        } else { art.placeholder.visible = dist < 8; }
       }
     });
   }
@@ -2403,10 +2373,7 @@
   // ═══════════════════════════════════════════════════════════════════
   // AGENT 3 — PLAYER CONTROLLER
   // ═══════════════════════════════════════════════════════════════════
-  let shadowFrameCount = 0;
-  const _lodForward = new THREE.Vector3();
-  const _lodToArt   = new THREE.Vector3();
-  let yaw   = Math.PI / 2;  // facing west (-X) toward the door at x=25 — player starts outside at x=30
+  let yaw   = -Math.PI / 2;  // facing east (toward the grand door)
   let pitch = 0;
   let isPointerLocked = false;
   let currentFOV = 72;
@@ -2421,37 +2388,35 @@
   // Pointer lock
   renderer.domElement.addEventListener('click', () => {
     if (!museumActive) return;
-    if (!panelOpen && !exitOverlayOpen) renderer.domElement.requestPointerLock();
+    if (!panelOpen) renderer.domElement.requestPointerLock();
   });
 
   document.addEventListener('pointerlockchange', () => {
     isPointerLocked = document.pointerLockElement === renderer.domElement;
     document.getElementById('crosshair').style.display = isPointerLocked ? 'block' : 'none';
-    // If pointer lock released while overlay is open, don't force re-lock
-    if (!document.pointerLockElement) {
-      if (!panelOpen && !exitOverlayOpen && !inspectActive) {
-        // pointer lock released by ESC — expected, do nothing
-      }
-    }
   });
 
   document.addEventListener('mousemove', (e) => {
-    if (!isPointerLocked || panelOpen || exitOverlayOpen) return;
+    if (!isPointerLocked || panelOpen) return;
     yaw   -= e.movementX * 0.0016;
     pitch -= e.movementY * 0.0016;
     pitch = Math.max(-Math.PI * 5 / 18, Math.min(Math.PI * 5 / 18, pitch));
   });
 
+  // Exit door state
+  const EXIT_DOOR_POS = { x: -18, z: 12 };
+  let nearExitDoor  = false;
+  let exitOverlayOpen = false;
+
   // Key E — open panel  |  Key F — toggle fullscreen
   document.addEventListener('keydown', (e) => {
     if (e.code === 'KeyR' && inspectActive) { closeInspectView(); return; }
-    // Exit door interaction
     if (e.code === 'KeyE' && nearExitDoor && !exitOverlayOpen && !panelOpen) {
       e.stopPropagation();
-      exitOverlayOpen = true;
-      panelOpen = true;
+      exitOverlayOpen = true; panelOpen = true;
       document.exitPointerLock();
-      document.getElementById('exit-overlay').style.display = 'flex';
+      const eo = document.getElementById('exit-overlay');
+      eo.style.display = 'flex';
       document.getElementById('exit-step1').style.display = 'block';
       document.getElementById('exit-step2').style.display = 'none';
       document.getElementById('exit-step3').style.display = 'none';
@@ -2520,14 +2485,16 @@
   // INFO PANEL
   // ═══════════════════════════════════════════════════════════════════
   function openPanel(art) {
-    document.getElementById('panel-number').textContent    = 'OPERA ' + String(art.id).padStart(2, '0') + ' / 06';
-    document.getElementById('panel-title').textContent     = art.title;
-    document.getElementById('panel-year').textContent      = art.year;
-    document.getElementById('panel-location').textContent  = art.location;
-    document.getElementById('panel-material').textContent  = art.material;
+    document.getElementById('panel-number').textContent      = 'OPERA ' + String(art.id).padStart(2, '0') + ' / 06';
+    document.getElementById('panel-title').textContent       = art.title;
+    document.getElementById('panel-author').textContent      = art.author || 'Antonio Canova (1757–1822)';
+    document.getElementById('panel-year').textContent        = art.year;
+    document.getElementById('panel-location').textContent    = art.location;
+    document.getElementById('panel-material').textContent    = art.material;
     document.getElementById('panel-committente').textContent = art.committente;
-    document.getElementById('panel-desc').textContent      = art.desc;
-    document.getElementById('panel-emotion').textContent   = art.emotion;
+    document.getElementById('panel-desc').textContent        = art.desc;
+    document.getElementById('panel-emotion').textContent     = art.emotion;
+    document.getElementById('panel-critica').textContent     = art.critica || '';
     document.getElementById('info-panel').classList.add('visible');
     panelOpen = true;
     document.exitPointerLock();
@@ -2548,23 +2515,21 @@
     entrance.style.opacity = '0';
     setTimeout(() => {
       entrance.style.display = 'none';
-      // Show welcome card (HUD shown after walk-in animation completes)
+      document.getElementById('title-watermark').style.display = 'block';
+      document.getElementById('controls-hint').style.display = 'block';
+      document.getElementById('minimap').style.display = 'block';
+      
+      // Show welcome card
       document.getElementById('welcome-card').classList.add('visible');
     }, 1500);
   });
 
   document.getElementById('welcome-close').addEventListener('click', () => {
-    const card = document.getElementById('welcome-card');
-    card.style.transition = 'opacity 0.5s ease';
-    card.style.opacity = '0';
+    document.getElementById('welcome-card').classList.remove('visible');
     setTimeout(() => {
-      card.style.display = 'none';
-      document.getElementById('minimap').style.display        = 'block';
-      document.getElementById('title-watermark').style.display  = 'block';
-      document.getElementById('controls-hint').style.display    = 'block';
       museumActive = true;
       renderer.domElement.requestPointerLock();
-    }, 500);
+    }, 400); // Wait for transition out
   });
 
   // ═══════════════════════════════════════════════════════════════════
@@ -2632,9 +2597,7 @@
     requestAnimationFrame(animate);
     updateLOD();
     shadowFrameCount++;
-    if (shadowFrameCount % 30 === 0) {
-      renderer.shadowMap.needsUpdate = true;
-    }
+    if (shadowFrameCount % 30 === 0) renderer.shadowMap.needsUpdate = true;
     const delta = Math.min(clock.getDelta(), 0.1);
 
     if (museumActive && !panelOpen) {
@@ -2664,6 +2627,15 @@
       camera.position.y = 1.72;
     }
 
+    // Exit door proximity
+    if (museumActive) {
+      const dxE = camera.position.x - EXIT_DOOR_POS.x;
+      const dzE = camera.position.z - EXIT_DOOR_POS.z;
+      nearExitDoor = Math.sqrt(dxE*dxE + dzE*dzE) < 5;
+      const ep = document.getElementById('exit-door-prompt');
+      if (ep) ep.style.display = (nearExitDoor && !panelOpen && !exitOverlayOpen) ? 'flex' : 'none';
+    }
+
     // Proximity detection
     let closest = null;
     let closestDist = Infinity;
@@ -2689,170 +2661,11 @@
       promptBg.classList.remove('visible');
     }
 
-    // Exit door proximity
-    if (museumActive) {
-      const dxExit = camera.position.x - EXIT_DOOR_POS.x;
-      const dzExit = camera.position.z - EXIT_DOOR_POS.z;
-      const distExit = Math.sqrt(dxExit * dxExit + dzExit * dzExit);
-      nearExitDoor = distExit < 5;
-      const exitPrompt = document.getElementById('exit-door-prompt');
-      if (nearExitDoor && !panelOpen && !exitOverlayOpen) {
-        exitPrompt.style.display = 'flex';
-      } else {
-        exitPrompt.style.display = 'none';
-      }
-    }
-
-    // Minimap
-    if (shadowFrameCount % 3 === 0) drawMinimap();
+    // Minimap — throttled to every 3 frames
+    if (museumActive && shadowFrameCount % 3 === 0) drawMinimap();
 
     renderer.render(scene, camera);
   }
-
-  // ── RECENSIONI DATA ───────────────────────────────────────────────────
-  const RECENSIONI = {
-    1: {
-      title: "Psiche ravvivata dal bacio di Amore",
-      text: `Questa scultura colpisce subito per la sua delicatezza straordinaria: Canova ha scelto di fermare il tempo nell'attimo prima del bacio, quando il desiderio e ancora sospeso nell'aria come qualcosa di fragile e impalpabile. Il risultato e un'opera che non parla solo di bellezza fisica, ma di emozione pura. Le labbra dei due amanti si avvicinano senza toccarsi — un millimetro di marmo che vale un'eternita.
-
-La composizione forma una X perfetta che invita lo spettatore a girare intorno alla scultura, scoprendo ogni volta un nuovo equilibrio, una nuova tensione. Canova levigo la superficie con "acqua di rota" per ottenere un effetto quasi carnale, quasi vivo. Si dice che levigasse il marmo con le mani scalze per sentire ogni imperfezione.
-
-Il marmo sembra respirare, e questo e forse il segreto piu profondo del Neoclassicismo: non copiare l'antico, ma trasformare la pietra in sentimento. Questa non e solo la storia di Amore e Psiche — e la storia di ogni momento in cui qualcosa di bello sta per accadere, e noi siamo ancora sull'orlo di quel momento.`
-    },
-    2: {
-      title: "Le Tre Grazie",
-      text: `Guardando quest'opera si fa fatica a credere che sia fatta di marmo. Canova e riuscito a dare alle tre figure una morbidezza quasi reale, come se il materiale avesse perso completamente la sua durezza naturale. Le dee — Aglaia, Eufrosine e Talia — si abbracciano in modo naturale e armonioso, senza la rigidita che caratterizza tanta scultura classica.
-
-La sfida tecnica era enorme: tre figure a grandezza naturale ricavate da un unico blocco di marmo, mai tentato prima. Tutte e tre si rivolgono verso lo spettatore, innovando la tradizione classica che prevedeva solo una figura frontale. Il poeta Ugo Foscolo rimase talmente colpito da dedicargli il carme incompiuto "Le Grazie".
-
-I contemporanei scrissero che quest'opera "e piu bella della bellezza stessa" — e forse avevano ragione. C'e qualcosa in quest'abbraccio che nessuna fotografia riesce a catturare completamente: la sensazione che quelle tre figure stiano condividendo un segreto, e che noi stiamo assistendo a qualcosa di intimo e prezioso.`
-    },
-    3: {
-      title: "Venere Italica",
-      text: `Questa Venere e diversa da tutte le statue greche che conosciamo. Non e una dea distante e perfetta che ci guarda dall'alto — e una donna colta in un momento intimo e privato, nell'atto pudico di coprirsi dopo il bagno. Il velo scende lungo i fianchi, lo sguardo e rivolto verso il basso.
-
-Canova le da un'espressione pudica, quasi timida, che la rende sorprendentemente vicina a noi. Ugo Foscolo la descrisse con una frase che rimane perfetta ancora oggi: "Se la Venere de' Medici e bellissima dea, questa e bellissima donna." La differenza tra dea e donna — tra l'ideale irraggiungibile e la bellezza che si puo incontrare per strada — e tutta in quella frase.
-
-Creata per sostituire la Venere de' Medici trafugata da Napoleone, Canova rifiuto di farne una semplice copia e creo invece qualcosa di completamente originale. La bellezza non come perfezione assoluta, ma come un momento umano da rispettare quasi in silenzio, come si rispetta qualcosa di sacro.`
-    },
-    4: {
-      title: "Paolina Borghese come Venere vincitrice",
-      text: `Canova riceve l'incarico di ritrarre Paolina Bonaparte e la trasforma in una dea. La scultura colpisce subito per i contrasti: la pelle levigata e fredda del marmo, il materasso che sembra morbido sotto il suo corpo, la posa regale ma rilassata. Paolina e ritratta come Venere vincitrice del Giudizio di Paride, con il pomo d'oro in mano — un dettaglio che non lascia dubbi sulla sua opinione di se stessa.
-
-Sotto il divano e nascosto un meccanismo girevole che permette alla scultura di ruotare a 360 gradi, quasi a voler mostrare ogni angolo di questa bellezza consapevole. Canova applico una patina rosata sul marmo per simulare il colore dell'incarnato — un trucco quasi cinematografico per il 1808.
-
-Desto grande scandalo tra i contemporanei: il marito di Paolina non la mostro mai in pubblico. Ma Paolina era orgogliosa dell'opera e rispose a chi le chiedeva come faceva a posare cosi scoperta: "Lo studio era riscaldato." E un ritratto che vuole essere eterno, e in qualche modo ci e riuscito.`
-    },
-    5: {
-      title: "Ebe",
-      text: `Ebe e forse la scultura piu "leggera" che Canova abbia mai realizzato. La figura sembra appena atterrata su quella nuvola di marmo, come se stesse per riprendere il volo da un momento all'altro. L'equilibrio su un solo piede e una sfida tecnica che nessun altro avrebbe osato tentare.
-
-Il panneggio mosso dal vento e la posizione del corpo danno un senso di movimento e velocita che di solito la scultura non riesce a trasmettere. Ebe era la coppiera degli dei dell'Olimpo, personificazione della giovinezza eterna — e Canova ha catturato esattamente questo: la leggerezza di chi non sa ancora cosa sia la stanchezza, di chi non ha ancora perso quella sensazione di essere invincibile.
-
-L'uso del bronzo dorato per l'anfora e la coppa suscito polemiche tra i critici che lo accusarono di mescolare i materiali. Canova rispose con una frase diventata celebre: "Se le avessi dato piu espressione, sarebbe diventata una baccante." Meno e piu — anche nel marmo.`
-    },
-    6: {
-      title: "Reclining Figure",
-      text: `Con Henry Moore usciamo completamente dal mondo neoclassico ed entriamo in qualcosa di radicalmente diverso. Il corpo umano qui non e idealizzato ne reso perfetto — e semplificato fino all'essenziale, ridotto a forme morbide e organiche che ricordano piu la natura che una persona reale.
-
-Non c'e volto riconoscibile, non ci sono dettagli anatomici precisi — solo la sensazione di un corpo che riposa, integrato nello spazio come se fosse parte del paesaggio. E come se Moore avesse detto: non ti mostro come sei fatto, ti mostro come ti senti quando sei finalmente a riposo.
-
-Rispetto a Canova, che cercava la perfezione assoluta del corpo umano, Moore cerca qualcosa di diverso: l'essenza, la forma primaria, la connessione con la terra. Se Canova ci dice "questo e il corpo perfetto", Moore ci dice "questo e cio che rimane quando togliamo tutto il superfluo." Non e una critica al passato — e una domanda che risuona ancora oggi: cos'e davvero la bellezza? Quella che si vede, o quella che si sente?`
-    }
-  };
-
-  // ── EXIT DOOR PROXIMITY + INTERACTION ────────────────────────────────
-  // Emergency door is on south wall near x=-18, z=12
-  const EXIT_DOOR_POS = { x: -18, z: 12 };
-  let nearExitDoor = false;
-  let exitOverlayOpen = false;
-
-  // Build recensioni selector buttons
-  (function buildRecSelectors() {
-    const sel = document.getElementById('rec-selector');
-    ARTWORKS.forEach(art => {
-      const btn = document.createElement('button');
-      btn.textContent = art.id + '. ' + art.title.split(' ').slice(0,3).join(' ') + '...';
-      btn.dataset.id = art.id;
-      btn.dataset.active = 'false';
-      btn.style.cssText = [
-        'padding:8px 16px;background:transparent;',
-        'border:1px solid #3a2e1c;color:#6b5c40;',
-        'font-family:Georgia,serif;font-size:0.72rem;',
-        'letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;'
-      ].join('');
-      btn.addEventListener('mouseenter', () => {
-        if (btn.dataset.active !== 'true') {
-          btn.style.borderColor = '#c9a96e';
-          btn.style.color = '#c9a96e';
-        }
-      });
-      btn.addEventListener('mouseleave', () => {
-        if (btn.dataset.active !== 'true') {
-          btn.style.borderColor = '#3a2e1c';
-          btn.style.color = '#6b5c40';
-        }
-      });
-      btn.addEventListener('click', () => {
-        sel.querySelectorAll('button').forEach(b => {
-          b.dataset.active = 'false';
-          b.style.borderColor = '#3a2e1c';
-          b.style.color = '#6b5c40';
-          b.style.background = 'transparent';
-        });
-        btn.dataset.active = 'true';
-        btn.style.borderColor = '#c9a96e';
-        btn.style.color = '#c9a96e';
-        btn.style.background = 'rgba(201,169,110,0.08)';
-        const rec = RECENSIONI[art.id];
-        const content = document.getElementById('rec-content');
-        content.innerHTML =
-          '<div style="margin-bottom:16px;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.3em;color:#c9a96e;text-transform:uppercase;margin-bottom:8px;">OPERA ' + String(art.id).padStart(2,'0') + ' / 06</div>' +
-          '<div style="font-size:1.05rem;color:#e8d5a3;font-weight:400;margin-bottom:4px;">' + rec.title + '</div>' +
-          '<div style="font-size:0.72rem;color:#5a4a30;font-style:italic;">' + art.year + ' &middot; ' + art.location + '</div>' +
-          '</div>' +
-          '<div style="width:100%;height:1px;background:linear-gradient(to right,#3a2e1c,transparent);margin-bottom:20px;"></div>' +
-          '<div style="color:#b5a07a;font-size:0.86rem;line-height:1.9;white-space:pre-line;">' + rec.text + '</div>';
-      });
-      sel.appendChild(btn);
-    });
-  })();
-
-  // Exit overlay button handlers
-  document.getElementById('exit-yes').addEventListener('click', () => {
-    document.getElementById('exit-step1').style.display = 'none';
-    document.getElementById('exit-step2').style.display = 'block';
-  });
-
-  document.getElementById('exit-no').addEventListener('click', () => {
-    document.getElementById('exit-overlay').style.display = 'none';
-    exitOverlayOpen = false;
-    panelOpen = false;
-    renderer.domElement.requestPointerLock();
-  });
-
-  document.getElementById('open-recensioni').addEventListener('click', () => {
-    document.getElementById('exit-step2').style.display = 'none';
-    document.getElementById('exit-step3').style.display = 'block';
-  });
-
-  document.getElementById('close-recensioni').addEventListener('click', () => {
-    document.getElementById('exit-overlay').style.display = 'none';
-    document.getElementById('exit-step1').style.display = 'block';
-    document.getElementById('exit-step2').style.display = 'none';
-    document.getElementById('exit-step3').style.display = 'none';
-    exitOverlayOpen = false;
-    panelOpen = false;
-    renderer.domElement.requestPointerLock();
-  });
-
-  document.getElementById('exit-anyway').addEventListener('click', () => {
-    document.getElementById('exit-overlay').style.display = 'none';
-    exitOverlayOpen = false;
-    panelOpen = false;
-    renderer.domElement.requestPointerLock();
-  });
 
   animate();
 
@@ -2985,18 +2798,15 @@ Rispetto a Canova, che cercava la perfezione assoluta del corpo umano, Moore cer
             if (art.id === 2) {
               child.material = new THREE.MeshStandardMaterial({
                 color: 0xf5f2ec,
-                roughness: 0.15,
-                metalness: 0.02,
+                roughness: 0.3,
+                metalness: 0.0,
                 side: THREE.DoubleSide
               });
             } else {
-              child.material = new THREE.MeshStandardMaterial({
-                color: 0xf5f2ec,
-                roughness: 0.15,
-                metalness: 0.02,
-                envMapIntensity: 1.4,
-                side: THREE.DoubleSide
-              });
+              if (child.material) {
+                child.material.side = THREE.DoubleSide;
+                child.material.needsUpdate = true;
+              }
             }
           }
         });
@@ -3077,6 +2887,62 @@ Rispetto a Canova, che cercava la perfezione assoluta del corpo umano, Moore cer
     if (ld) ld.remove();
   }
 
+  // ── EXIT DOOR INTERACTION ─────────────────────────────────────────
+
+  // Build recensioni selector
+  (function buildRecSelectors() {
+    const sel = document.getElementById('rec-selector');
+    ARTWORKS.forEach(art => {
+      const btn = document.createElement('button');
+      btn.textContent = art.id + '. ' + art.title.split(' ').slice(0,3).join(' ') + '...';
+      btn.dataset.id = art.id;
+      btn.style.cssText = 'padding:8px 16px;background:transparent;border:1px solid #3a2e1c;color:#6b5c40;font-family:Georgia,serif;font-size:0.72rem;letter-spacing:0.15em;cursor:pointer;transition:all 0.2s;';
+      btn.addEventListener('mouseenter', () => { btn.style.borderColor='#c9a96e'; btn.style.color='#c9a96e'; });
+      btn.addEventListener('mouseleave', () => {
+        if (btn.dataset.active !== 'true') { btn.style.borderColor='#3a2e1c'; btn.style.color='#6b5c40'; }
+      });
+      btn.addEventListener('click', () => {
+        sel.querySelectorAll('button').forEach(b => { b.dataset.active='false'; b.style.borderColor='#3a2e1c'; b.style.color='#6b5c40'; b.style.background='transparent'; });
+        btn.dataset.active='true'; btn.style.borderColor='#c9a96e'; btn.style.color='#c9a96e'; btn.style.background='rgba(201,169,110,0.08)';
+        document.getElementById('rec-content').innerHTML =
+          '<div style="margin-bottom:16px;">' +
+          '<div style="font-size:0.58rem;letter-spacing:0.3em;color:#c9a96e;text-transform:uppercase;margin-bottom:8px;">OPERA '+String(art.id).padStart(2,'0')+' / 06</div>' +
+          '<div style="font-size:1.05rem;color:#e8d5a3;margin-bottom:4px;">'+art.title+'</div>' +
+          '<div style="font-size:0.72rem;color:#5a4a30;font-style:italic;">'+art.year+' · '+art.location+'</div></div>' +
+          '<div style="width:100%;height:1px;background:linear-gradient(to right,#3a2e1c,transparent);margin-bottom:20px;"></div>' +
+          '<div style="color:#b5a07a;font-size:0.86rem;line-height:1.9;">'+(art.critica||'Critica non disponibile.')+'</div>';
+      });
+      sel.appendChild(btn);
+    });
+  })();
+
+  document.getElementById('exit-yes').addEventListener('click', () => {
+    document.getElementById('exit-step1').style.display = 'none';
+    document.getElementById('exit-step2').style.display = 'block';
+  });
+  document.getElementById('exit-no').addEventListener('click', () => {
+    document.getElementById('exit-overlay').style.display = 'none';
+    exitOverlayOpen = false; panelOpen = false;
+    renderer.domElement.requestPointerLock();
+  });
+  document.getElementById('open-recensioni').addEventListener('click', () => {
+    document.getElementById('exit-step2').style.display = 'none';
+    document.getElementById('exit-step3').style.display = 'block';
+  });
+  document.getElementById('close-recensioni').addEventListener('click', () => {
+    document.getElementById('exit-overlay').style.display = 'none';
+    document.getElementById('exit-step1').style.display = 'block';
+    document.getElementById('exit-step2').style.display = 'none';
+    document.getElementById('exit-step3').style.display = 'none';
+    exitOverlayOpen = false; panelOpen = false;
+    renderer.domElement.requestPointerLock();
+  });
+  document.getElementById('exit-anyway').addEventListener('click', () => {
+    document.getElementById('exit-overlay').style.display = 'none';
+    exitOverlayOpen = false; panelOpen = false;
+    renderer.domElement.requestPointerLock();
+  });
+
   </script>
 
 <div id="inspect-overlay" style="
@@ -3135,7 +3001,5 @@ Rispetto a Canova, che cercava la perfezione assoluta del corpo umano, Moore cer
     </div>
   </div>
 </div>
-
-
-</body></body>
+</body>
 </html>
