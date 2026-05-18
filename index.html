@@ -442,6 +442,21 @@
       transition: width 0.3s ease;
     }
 
+    /* ─── WELCOME BACKDROP ─── */
+    #welcome-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 149;
+      background: #080604;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.5s ease;
+    }
+    #welcome-backdrop.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
     /* ─── WELCOME CARD ─── */
     #welcome-card {
       position: fixed;
@@ -575,10 +590,10 @@
     <div class="panel-divider"></div>
     <span class="panel-label">Emozioni</span>
     <div id="panel-emotion">–</div>
-    <div class="panel-divider"></div>
-    <span class="panel-label">Critica d'Arte</span>
-    <div id="panel-critica" style="font-size:0.78rem;line-height:1.7;color:#b5a07a;">–</div>
   </div>
+
+  <!-- Welcome Backdrop -->
+  <div id="welcome-backdrop"></div>
 
   <!-- Welcome Card -->
   <div id="welcome-card">
@@ -955,7 +970,7 @@
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 0.95;
+  renderer.toneMappingExposure = 0.75;
   renderer.outputEncoding = THREE.sRGBEncoding;
   renderer.shadowMap.autoUpdate = false;
   renderer.shadowMap.needsUpdate = true;
@@ -974,11 +989,8 @@
     },
     undefined,
     () => {
-      const pmrem2 = new THREE.PMREMGenerator(renderer);
-      pmrem2.compileEquirectangularShader();
-      const rt = pmrem2.fromScene(new THREE.RoomEnvironment());
-      scene.environment = rt.texture;
-      pmrem2.dispose();
+      // HDR file not available (e.g. GitHub Pages) — rely on scene lights only.
+      // RoomEnvironment removed: it caused washed-out brightness on hosted builds.
     }
   );
 
@@ -2466,7 +2478,6 @@
     document.getElementById('panel-committente').textContent = art.committente;
     document.getElementById('panel-desc').textContent        = art.desc;
     document.getElementById('panel-emotion').textContent     = art.emotion;
-    document.getElementById('panel-critica').textContent     = art.critica || '';
     document.getElementById('info-panel').classList.add('visible');
     panelOpen = true;
     document.exitPointerLock();
@@ -2491,12 +2502,14 @@
       document.getElementById('controls-hint').style.display = 'block';
       document.getElementById('minimap').style.display = 'block';
       
-      // Show welcome card
+      // Show welcome card + backdrop
+      document.getElementById('welcome-backdrop').classList.add('visible');
       document.getElementById('welcome-card').classList.add('visible');
     }, 1500);
   });
 
   document.getElementById('welcome-close').addEventListener('click', () => {
+    document.getElementById('welcome-backdrop').classList.remove('visible');
     document.getElementById('welcome-card').classList.remove('visible');
     setTimeout(() => {
       museumActive = true;
