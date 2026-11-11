@@ -806,7 +806,6 @@
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/DRACOLoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/RGBELoader.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/environments/RoomEnvironment.js"></script>
 
   <script>
@@ -954,6 +953,11 @@
     { type:'cylinder', cx:12,  cz:5,  r:1.2 },
   ];
 
+  // Pedestals — one AABB per artwork so the player can't walk through them
+  ARTWORKS.forEach(art => {
+    COLLISION_BOXES.push({ type:'wall', minX: art.position.x - 0.8, maxX: art.position.x + 0.8, minZ: art.position.z - 0.8, maxZ: art.position.z + 0.8 });
+  });
+
   // ═══════════════════════════════════════════════════════════════════
   // THREE.JS SETUP
   // ═══════════════════════════════════════════════════════════════════
@@ -967,32 +971,13 @@
   const renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled = false;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 0.75;
   renderer.outputEncoding = THREE.sRGBEncoding;
-  renderer.shadowMap.autoUpdate = false;
-  renderer.shadowMap.needsUpdate = true;
   document.body.appendChild(renderer.domElement);
 
-  // ── HDR ENVIRONMENT MAP ───────────────────────────────────────────
-  const pmremGenerator = new THREE.PMREMGenerator(renderer);
-  pmremGenerator.compileEquirectangularShader();
-  new THREE.RGBELoader().load(
-    'hdri/studio.hdr',
-    (texture) => {
-      const envMap = pmremGenerator.fromEquirectangular(texture).texture;
-      scene.environment = envMap;
-      texture.dispose();
-      pmremGenerator.dispose();
-    },
-    undefined,
-    () => {
-      // HDR file not available (e.g. GitHub Pages) — rely on scene lights only.
-      // RoomEnvironment removed: it caused washed-out brightness on hosted builds.
-    }
-  );
 
   window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -1962,76 +1947,6 @@
     scene.add(pl);
   })();
 
-  (function buildEmergencyExit() {
-    const edX=-18, edZ=14.85;
-    const emerMat  = new THREE.MeshStandardMaterial({ color: 0xdddbd5, roughness: 0.6 });
-    const emerBar  = new THREE.MeshStandardMaterial({ color: 0xcc2200, roughness: 0.4, metalness: 0.3 });
-    const emerSign = new THREE.MeshStandardMaterial({ color: 0x1a7a2a, roughness: 0.5, emissive: 0x0a3a10, emissiveIntensity: 0.5 });
-    const emerFrame= new THREE.MeshStandardMaterial({ color: 0x888880, roughness: 0.5, metalness: 0.2 });
-
-    // Frame
-    const dfTop = new THREE.Mesh(new THREE.BoxGeometry(3.2,0.12,0.12), emerFrame);
-    dfTop.position.set(edX,3.26,edZ); scene.add(dfTop);
-    [-1.5,1.5].forEach(xo => {
-      const s = new THREE.Mesh(new THREE.BoxGeometry(0.12,3.4,0.12), emerFrame);
-      s.position.set(edX+xo,1.6,edZ); scene.add(s);
-    });
-
-    // Door leaves
-    [-0.73,0.73].forEach(xo => {
-      const leaf = new THREE.Mesh(new THREE.BoxGeometry(1.34,3.1,0.1), emerMat);
-      leaf.position.set(edX+xo,1.55,edZ); scene.add(leaf);
-    });
-
-    // Red panic bar
-    const pb = new THREE.Mesh(new THREE.BoxGeometry(2.6,0.1,0.12), emerBar);
-    pb.position.set(edX,1.05,edZ-0.04); scene.add(pb);
-
-    // Green exit sign with baked text
-    const signCv = document.createElement('canvas');
-    signCv.width = 512; signCv.height = 200;
-    const scx = signCv.getContext('2d');
-    scx.fillStyle = '#1a7a2a'; scx.fillRect(0, 0, 512, 200);
-    scx.fillStyle = '#ffffff'; scx.textAlign = 'center'; scx.textBaseline = 'middle';
-    scx.font = 'bold 38px Arial, sans-serif'; scx.fillText('USCITA DI EMERGENZA', 256, 68);
-    scx.font = 'bold 28px Arial, sans-serif'; scx.fillText('EMERGENCY EXIT', 256, 120);
-    scx.font = '20px Arial'; scx.fillText('maniglione antipanico', 256, 168);
-    const es = new THREE.Mesh(
-      new THREE.BoxGeometry(1.6, 0.48, 0.06),
-      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(signCv) })
-    );
-    es.position.set(edX, 3.62, edZ - 0.04); scene.add(es);
-
-    // Yellow hazard strip
-    const hc = document.createElement('canvas');
-    hc.width=256; hc.height=64;
-    const hx = hc.getContext('2d');
-    for(let i=0;i<8;i++){hx.fillStyle=i%2===0?'#f0c020':'#1a1a1a';hx.fillRect(i*32,0,32,64);}
-    const hm = new THREE.Mesh(new THREE.PlaneGeometry(3.0,0.8),
-      new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(hc), transparent:true, opacity:0.85 }));
-    hm.rotation.x=-Math.PI/2; hm.position.set(edX,0.003,edZ-0.6); scene.add(hm);
-
-    // Fire extinguisher
-    const exX=-20.2, exZ=14.7;
-    const extRed = new THREE.MeshStandardMaterial({ color: 0xcc1100, roughness: 0.35, metalness: 0.3 });
-    const extBlk = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.5, metalness: 0.2 });
-    const extSil = new THREE.MeshStandardMaterial({ color: 0xaaaaaa, roughness: 0.3, metalness: 0.6 });
-    const eb = new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.7,16), extRed);
-    eb.position.set(exX,1.25,exZ-0.18); scene.add(eb);
-    const en = new THREE.Mesh(new THREE.CylinderGeometry(0.04,0.08,0.1,12), extSil);
-    en.position.set(exX,1.65,exZ-0.18); scene.add(en);
-    const ev = new THREE.Mesh(new THREE.BoxGeometry(0.18,0.04,0.05), extBlk);
-    ev.position.set(exX,1.76,exZ-0.18); scene.add(ev);
-    const wallSignC = document.createElement('canvas');
-    wallSignC.width=256; wallSignC.height=80;
-    const wsc = wallSignC.getContext('2d');
-    wsc.fillStyle='#cc2200'; wsc.fillRect(0,0,256,80);
-    wsc.fillStyle='#ffffff'; wsc.font='bold 20px Arial'; wsc.textAlign='center'; wsc.textBaseline='middle';
-    wsc.fillText('ESTINTORE',128,40);
-    const ws = new THREE.Mesh(new THREE.PlaneGeometry(0.35,0.11),
-      new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(wallSignC) }));
-    ws.position.set(exX,1.75,exZ-0.04); scene.add(ws);
-  })();
 
   // ═══════════════════════════════════════════════════════════════════
   // AGENT 2 — LIGHTING  (theatrical: dark base + focused warm spots)
@@ -2179,16 +2094,17 @@
 
   // ── LOD LAZY LOADING SYSTEM ───────────────────────────────────────
   let modelsLoaded = 0;
-  const totalModels = ARTWORKS.length;
+  let modelsStarted = 0;
+  const PRELOAD_RADIUS = 20;
   let shadowFrameCount = 0;
   const _lodForward = new THREE.Vector3();
   const _lodToArt   = new THREE.Vector3();
 
   function updateLoadingBar() {
     modelsLoaded++;
-    const pct = (modelsLoaded / totalModels) * 100;
+    const pct = modelsStarted > 0 ? (modelsLoaded / modelsStarted) * 100 : 0;
     document.getElementById('loading-bar').style.width = pct + '%';
-    if (modelsLoaded >= totalModels) {
+    if (modelsStarted > 0 && modelsLoaded >= modelsStarted) {
       setTimeout(() => {
         const lo = document.getElementById('loading-overlay');
         lo.classList.add('hidden');
@@ -2252,19 +2168,19 @@
     art.mesh = ph; // so proximity detection works immediately
   });
 
-  // Kick off loading for all artworks immediately so the loading bar fills on startup
-  ARTWORKS.forEach(art => loadModel(art));
+  // Models load lazily — updateLOD() starts fetching when the player is within PRELOAD_RADIUS
 
   // Load one model
   function loadModel(art) {
     if (art.loadState !== 'idle') return;
     art.loadState = 'loading';
+    modelsStarted++;
     loader.load(
       art.model,
       (gltf) => {
         const model = gltf.scene;
         placeModel(model, art);
-        const mat = makeMarbleMat('high');
+        const mat = LOD_MATS.high;
         model.traverse(child => {
           if (child.isMesh) {
             child.material      = mat;
@@ -2290,6 +2206,16 @@
     );
   }
 
+  // LOD materials are created once and reused — swapping must not allocate new materials
+  const LOD_MATS = {
+    high:   makeMarbleMat('high'),
+    medium: makeMarbleMat('medium'),
+    far: new THREE.MeshStandardMaterial({
+      color: 0xf5f2ec, roughness: 0.4, metalness: 0.0,
+      envMapIntensity: 0.2, side: THREE.DoubleSide
+    })
+  };
+
   // LOD + back-hemisphere culling
   function updateLOD() {
     const camPos = camera.position;
@@ -2299,6 +2225,9 @@
       const dx   = camPos.x - art.position.x;
       const dz   = camPos.z - art.position.z;
       const dist = Math.sqrt(dx * dx + dz * dz);
+
+      // Lazy load: start fetching when the player is within preload radius
+      if (art.loadState === 'idle' && dist <= PRELOAD_RADIUS) loadModel(art);
 
       // Back-hemisphere culling: hide if far AND behind player
       _lodToArt.set(-dx, 0, -dz).normalize();
@@ -2311,42 +2240,33 @@
 
       if (dist > 20) {
         // FAR — very low quality, still visible
-        if (art.loadState === 'idle') loadModel(art);
         if (art.loadState === 'loaded' && art.lodMesh) {
           art.lodMesh.visible = true;
           art.placeholder.visible = false;
           if (art.currentMat !== 'far') {
-            const m = new THREE.MeshStandardMaterial({
-              color: 0xf5f2ec, roughness: 0.4, metalness: 0.0,
-              envMapIntensity: 0.2, side: THREE.DoubleSide
-            });
-            art.lodMesh.traverse(c => { if (c.isMesh) c.material = m; });
+            art.lodMesh.traverse(c => { if (c.isMesh) c.material = LOD_MATS.far; });
             art.currentMat = 'far';
           }
         } else { art.placeholder.visible = true; }
 
       } else if (dist > 8) {
         // MEDIUM
-        if (art.loadState === 'idle') loadModel(art);
         if (art.loadState === 'loaded' && art.lodMesh) {
           art.lodMesh.visible = true;
           art.placeholder.visible = false;
           if (art.currentMat !== 'medium') {
-            const m = makeMarbleMat('medium');
-            art.lodMesh.traverse(c => { if (c.isMesh) c.material = m; });
+            art.lodMesh.traverse(c => { if (c.isMesh) c.material = LOD_MATS.medium; });
             art.currentMat = 'medium';
           }
         } else { art.placeholder.visible = true; }
 
       } else {
         // CLOSE — full quality
-        if (art.loadState === 'idle') loadModel(art);
         if (art.loadState === 'loaded' && art.lodMesh) {
           art.lodMesh.visible = true;
           art.placeholder.visible = false;
           if (art.currentMat !== 'high') {
-            const m = makeMarbleMat('high');
-            art.lodMesh.traverse(c => { if (c.isMesh) c.material = m; });
+            art.lodMesh.traverse(c => { if (c.isMesh) c.material = LOD_MATS.high; });
             art.currentMat = 'high';
           }
         } else { art.placeholder.visible = dist < 8; }
@@ -2411,9 +2331,9 @@
     }
     if (e.code === 'KeyT' && nearbyArtwork && !panelOpen && !inspectActive) openInspectView(nearbyArtwork);
     if (e.code === 'Escape') {
-      if (panelOpen) {
-        closePanel();
-      }
+      if (exitOverlayOpen) { closeExitOverlay(); return; }
+      if (inspectActive) { closeInspectView(); return; }
+      if (panelOpen) closePanel();
     }
     if (e.code === 'KeyF' && !inspectActive) {
       if (!document.fullscreenElement) {
@@ -2469,7 +2389,7 @@
   // INFO PANEL
   // ═══════════════════════════════════════════════════════════════════
   function openPanel(art) {
-    document.getElementById('panel-number').textContent      = 'OPERA ' + String(art.id).padStart(2, '0') + ' / 06';
+    document.getElementById('panel-number').textContent      = 'OPERA ' + String(art.id).padStart(2, '0') + ' / ' + String(ARTWORKS.length).padStart(2, '0');
     document.getElementById('panel-title').textContent       = art.title;
     document.getElementById('panel-author').textContent      = art.author || 'Antonio Canova (1757–1822)';
     document.getElementById('panel-year').textContent        = art.year;
@@ -2569,7 +2489,7 @@
     ctx.lineWidth = 1.5;
     ctx.beginPath();
     ctx.moveTo(pp.x, pp.y);
-    ctx.lineTo(pp.x + Math.sin(yaw) * -7, pp.y + Math.cos(yaw) * -7);
+    ctx.lineTo(pp.x - Math.sin(yaw) * 7, pp.y + Math.cos(yaw) * 7);
     ctx.stroke();
   }
 
@@ -2582,7 +2502,6 @@
     requestAnimationFrame(animate);
     updateLOD();
     shadowFrameCount++;
-    if (shadowFrameCount % 30 === 0) renderer.shadowMap.needsUpdate = true;
     const delta = Math.min(clock.getDelta(), 0.1);
 
     if (museumActive && !panelOpen) {
@@ -2891,7 +2810,7 @@
         btn.dataset.active='true'; btn.style.borderColor='#c9a96e'; btn.style.color='#c9a96e'; btn.style.background='rgba(201,169,110,0.08)';
         document.getElementById('rec-content').innerHTML =
           '<div style="margin-bottom:16px;">' +
-          '<div style="font-size:0.58rem;letter-spacing:0.3em;color:#c9a96e;text-transform:uppercase;margin-bottom:8px;">OPERA '+String(art.id).padStart(2,'0')+' / 06</div>' +
+          '<div style="font-size:0.58rem;letter-spacing:0.3em;color:#c9a96e;text-transform:uppercase;margin-bottom:8px;">OPERA '+String(art.id).padStart(2,'0')+' / '+String(ARTWORKS.length).padStart(2,'0')+'</div>' +
           '<div style="font-size:1.05rem;color:#e8d5a3;margin-bottom:4px;">'+art.title+'</div>' +
           '<div style="font-size:0.72rem;color:#5a4a30;font-style:italic;">'+art.year+' · '+art.location+'</div></div>' +
           '<div style="width:100%;height:1px;background:linear-gradient(to right,#3a2e1c,transparent);margin-bottom:20px;"></div>' +
@@ -2901,31 +2820,31 @@
     });
   })();
 
-  document.getElementById('exit-yes').addEventListener('click', () => {
-    document.getElementById('exit-step1').style.display = 'none';
-    document.getElementById('exit-step2').style.display = 'block';
-  });
-  document.getElementById('exit-no').addEventListener('click', () => {
-    document.getElementById('exit-overlay').style.display = 'none';
-    exitOverlayOpen = false; panelOpen = false;
-    renderer.domElement.requestPointerLock();
-  });
-  document.getElementById('open-recensioni').addEventListener('click', () => {
-    document.getElementById('exit-step2').style.display = 'none';
-    document.getElementById('exit-step3').style.display = 'block';
-  });
-  document.getElementById('close-recensioni').addEventListener('click', () => {
+  function closeExitOverlay() {
     document.getElementById('exit-overlay').style.display = 'none';
     document.getElementById('exit-step1').style.display = 'block';
     document.getElementById('exit-step2').style.display = 'none';
     document.getElementById('exit-step3').style.display = 'none';
     exitOverlayOpen = false; panelOpen = false;
     renderer.domElement.requestPointerLock();
+  }
+
+  document.getElementById('exit-yes').addEventListener('click', () => {
+    document.getElementById('exit-step1').style.display = 'none';
+    document.getElementById('exit-step2').style.display = 'block';
+  });
+  document.getElementById('exit-no').addEventListener('click', () => {
+    closeExitOverlay();
+  });
+  document.getElementById('open-recensioni').addEventListener('click', () => {
+    document.getElementById('exit-step2').style.display = 'none';
+    document.getElementById('exit-step3').style.display = 'block';
+  });
+  document.getElementById('close-recensioni').addEventListener('click', () => {
+    closeExitOverlay();
   });
   document.getElementById('exit-anyway').addEventListener('click', () => {
-    document.getElementById('exit-overlay').style.display = 'none';
-    exitOverlayOpen = false; panelOpen = false;
-    renderer.domElement.requestPointerLock();
+    closeExitOverlay();
   });
 
   </script>

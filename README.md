@@ -1,5 +1,5 @@
 # MARMO E ANIMA — Museo Virtuale 3D
-### Una Mostra su Antonio Canova · Cinque Capolavori Neoclassici
+### Una Mostra su Antonio Canova · Cinque opere neoclassiche + un'opera moderna
 
 ---
 
@@ -7,20 +7,20 @@
 
 GLTFLoader richiede un server HTTP — aprire `index.html` direttamente con `file://` bloccherà il caricamento dei modelli 3D per via delle restrizioni CORS.
 
-**1. Apri una finestra del terminale nella cartella del progetto:**
-```
-c:\Users\chair\Desktop\art meseum
-```
+**1. Apri una finestra del terminale nella cartella del progetto**
 
-**2. Avvia il server Python:**
+**2. Installa le dipendenze (una volta sola) e avvia il dev server Vite:**
 ```
-python -m http.server 8080
+npm install
+npm run dev
 ```
 
 **3. Apri nel browser:**
 ```
 http://localhost:8080
 ```
+
+In alternativa, senza npm: `python -m http.server 8080`, poi apri `http://localhost:8080`.
 
 **Browser consigliato:** Chrome o Edge (desktop) — richiedono l'API Pointer Lock.
 
@@ -33,52 +33,51 @@ http://localhost:8080
 | `W A S D` | Muoversi |
 | `Mouse` | Guardare intorno |
 | `Shift` (tenuto) | Correre |
-| `E` | Aprire la scheda dell'opera vicina |
+| `E` | Aprire la scheda dell'opera vicina (o il pannello d'uscita, vicino alla porta) |
+| `T` | Ispezione 3D dell'opera vicina |
+| `R` | Esci dall'ispezione 3D |
+| `F` | Schermo intero |
 | `ESC` | Chiudere la scheda / sbloccare il mouse |
 | `Click` sulla scena | Bloccare il mouse (pointer lock) |
 
 ---
 
-## File modelli nella cartella `models/`
+## File modelli nella cartella `models/models_opt/`
 
-| Opera | File atteso |
-|-------|-------------|
-| Psiche ravvivata dal bacio di Amore | `3d_printable_psyche_revived_by_cupid.glb` |
-| Le Tre Grazie | `the_three_graces.glb` |
-| Venere Italica | `10-smk-venus-italica-kas-dep1.glb` |
-| Paolina Borghese come Venere vincitrice | `Statue of Paolina Borghese como Venere vincitrice by Antonio Canova, Galleria Borghese, Roma .glb` |
-| Ebe | `ebe.glb` *(mancante — viene mostrato un segnaposto cilindrico)* |
+| Opera | File |
+|-------|------|
+| Psiche ravvivata dal bacio di Amore | `psiche.glb` |
+| Le Tre Grazie | `le_tre_grazie.glb` |
+| Venere Italica | `venere_italica.glb` |
+| Paolina Borghese come Venere vincitrice | `paolina.glb` |
+| Ebe | `ebe.glb` |
+| Reclining Figure (Henry Moore, 1951) | `Reclining_Figure.glb` |
 
-> **Nota:** Se un modello non viene trovato, il museo non va in crash — mostra automaticamente un cilindro bianco al posto della scultura.
+Tutti e 6 i modelli sono inclusi nel repository. Se un file non viene trovato, il museo non va in crash — mostra automaticamente un cilindro bianco al posto della scultura.
 
 ---
 
-## Come aggiungere `ebe.glb`
+## Rigenerare un modello 3D
 
-Quando il file sarà disponibile:
+Per rigenerare una scultura da una foto (es. sostituire un modello esistente):
 
-1. Genera il modello 3D da una foto della scultura usando uno di questi servizi:
-   - [tripo3d.ai](https://tripo3d.ai)
-   - [Hugging Face — TRELLIS](https://huggingface.co/spaces/JeffreyXiang/TRELLIS)
-2. Esporta come **GLB**
-3. Rinomina il file in `ebe.glb`
-4. Copialo nella cartella `models/`
-5. Ricarica `http://localhost:8080`
+1. Usa [tripo3d.ai](https://tripo3d.ai) o [Hugging Face — TRELLIS](https://huggingface.co/spaces/JeffreyXiang/TRELLIS)
+2. Esporta come **GLB** (compressione Draco consigliata)
+3. Sostituisci il file corrispondente in `models/models_opt/`
+4. Ricarica `http://localhost:8080`
 
 ---
 
 ## Struttura del progetto
 
 ```
-art meseum/
-├── index.html                    ← L'intera applicazione museo
-├── README.md                     ← Questo file
-└── models/
-    ├── 3d_printable_psyche_revived_by_cupid.glb
-    ├── the_three_graces.glb
-    ├── 10-smk-venus-italica-kas-dep1.glb
-    ├── Statue of Paolina Borghese como Venere vincitrice by Antonio Canova, Galleria Borghese, Roma .glb
-    └── ebe.glb  (da aggiungere)
+marmo-e-anima/
+├── index.html                          ← Tutta l'applicazione (JS + CSS + HTML)
+├── package.json                        ← Vite come dev server (`npm run dev`)
+├── README.md / DEVLOG.md
+├── Antonio-Canova-biografia-e-opere.jpg ← Retratto nella schermata d'ingresso
+├── statue_pics/                        ← Foto delle opere (tele dei pannelli)
+└── models/models_opt/                  ← I 6 modelli GLB delle sculture
 ```
 
 ---
@@ -89,7 +88,7 @@ art meseum/
 - **GLTFLoader** — caricamento modelli sculture
 - **Pointer Lock API** — controllo mouse in first-person
 - **Canvas 2D API** — texture procedurali (pavimento a diamanti, soffitto a cassettoni, minimappa)
-- Zero dipendenze npm — tutto vanilla HTML + JavaScript
+- **Vite 5** — solo dev server; a runtime zero dipendenze npm (vanilla HTML + JS)
 
 ---
 
